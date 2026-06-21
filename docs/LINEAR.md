@@ -30,7 +30,7 @@ save_issue(id: "KRE-117", state: "Done")
 
 | Milestone | Status |
 |-----------|--------|
-| Phase 0 — Foundation | In progress |
+| Phase 0 — Foundation | Complete |
 | Phase 1 — Scaffolding | Backlog |
 
 ## Issue index (Phase 0 + 1)

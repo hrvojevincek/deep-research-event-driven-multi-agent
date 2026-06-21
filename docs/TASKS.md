@@ -7,6 +7,7 @@ Living roadmap for EventForge development. Structured for **Linear integration**
 **Linear (active):** [EventForge project](https://linear.app/kreativbiro/project/eventforge-f35070f0931e) — see `docs/LINEAR.md` for issue index.
 
 **How to use:**
+
 > "What's next in EventForge?" · "Implement KRE-118" · "Mark KRE-117 done"
 
 When an issue closes → check the matching box below and ensure `KRE-xxx` link is present.
@@ -16,7 +17,7 @@ When an issue closes → check the matching box below and ensure `KRE-xxx` link 
 ## Phase 0: Foundation & Documentation
 
 **Goal:** Project structure, documentation, and local infrastructure skeleton.  
-**Status:** In Progress
+**Status:** Complete
 
 - [x] Define folder structure and repo scaffold
 - [x] Create `CLAUDE.md` (AI context)
@@ -31,8 +32,8 @@ When an issue closes → check the matching box below and ensure `KRE-xxx` link 
 - [x] Add `.env.example`, `.gitignore`, `Makefile`, `README.md`
 - [x] Add LocalStack init script for EventBridge + SQS
 - [x] Create Linear EventForge project + Phase 0/1 issues (`docs/LINEAR.md`)
-- [ ] Initialize git repository and first commit → [KRE-117](https://linear.app/kreativbiro/issue/KRE-117)
-- [ ] Verify `make dev` starts infrastructure cleanly → [KRE-117](https://linear.app/kreativbiro/issue/KRE-117)
+- [x] Initialize git repository and first commit → [KRE-117](https://linear.app/kreativbiro/issue/KRE-117)
+- [x] Verify `make dev` starts infrastructure cleanly → [KRE-117](https://linear.app/kreativbiro/issue/KRE-117)
 
 ---
 
@@ -44,8 +45,8 @@ When an issue closes → check the matching box below and ensure `KRE-xxx` link 
 
 → [KRE-118](https://linear.app/kreativbiro/issue/KRE-118) · [KRE-120](https://linear.app/kreativbiro/issue/KRE-120) · [KRE-123](https://linear.app/kreativbiro/issue/KRE-123) · [KRE-125](https://linear.app/kreativbiro/issue/KRE-125)
 
-- [ ] Initialize `backend/` with `pyproject.toml` (uv) — KRE-118
-- [ ] Create `src/eventforge/` package structure — KRE-118
+- [x] Initialize `backend/` with `pyproject.toml` (uv) — KRE-118
+- [x] Create `src/eventforge/` package structure — KRE-118
 - [ ] FastAPI app with `/health` and `/health/ready` endpoints — KRE-120
 - [ ] SQLAlchemy 2.0 + Alembic setup — KRE-123
 - [ ] Core models: `User`, `Job`, `JobStage`, `ProcessedEvent` — KRE-123
@@ -272,4 +273,4 @@ Project: EventForge
 
 **Next up:** Complete Phase 0 verification, then **Phase 1 — Application Scaffolding**.
 
-Say: *"Implement Phase 1"* to begin backend and frontend initialization.
+Say: _"Implement Phase 1"_ to begin backend and frontend initialization.
