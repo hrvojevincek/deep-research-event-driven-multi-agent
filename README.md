@@ -38,7 +38,7 @@ make dev
 - **Frontend:** Next.js 15, TypeScript, Tailwind, shadcn/ui, React Flow
 - **Backend:** Python FastAPI, async workers, agent orchestration
 - **Events:** AWS EventBridge + SQS + Step Functions
-- **Data:** Postgres (RDS) + Qdrant (vectors)
+- **Data:** Postgres 16 + pgvector (RDS)
 - **Cloud:** AWS (Terraform IaC)
 - **Observability:** OpenTelemetry
 

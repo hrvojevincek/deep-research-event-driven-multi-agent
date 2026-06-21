@@ -16,7 +16,7 @@ Event-driven multi-agent research platform. Users submit queries → EventBridge
 | Frontend | Next.js 15 App Router, TS, Tailwind, shadcn/ui, React Flow |
 | Backend | Python 3.12+, FastAPI, Pydantic v2, SQLAlchemy 2.0 |
 | Events | AWS EventBridge + SQS + Step Functions |
-| Data | Postgres 16 + Qdrant (PGVector fallback) |
+| Data | Postgres 16 + pgvector |
 | Auth | Clerk JWT → FastAPI validation |
 | Observability | OpenTelemetry → OTLP |
 | IaC | Terraform (`infra/terraform/`) |
@@ -33,7 +33,7 @@ Event-driven multi-agent research platform. Users submit queries → EventBridge
 
 ```bash
 ./scripts/setup-local.sh   # first time
-make dev                   # Postgres + Qdrant + LocalStack
+make dev                   # Postgres (pgvector) + LocalStack
 make down / make logs
 ```
 

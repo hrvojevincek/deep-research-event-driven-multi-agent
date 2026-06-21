@@ -85,7 +85,7 @@ flowchart LR
 | Agent | Responsibility |
 |-------|----------------|
 | **Ingestion** | Parse query, fetch initial sources (web/API), normalize documents |
-| **Embedding** | Chunk documents, generate embeddings, store in Qdrant |
+| **Embedding** | Chunk documents, generate embeddings, store in Postgres (pgvector) |
 | **Knowledge Mining** | Retrieve relevant chunks, extract entities, build knowledge graph edges |
 | **Research (parallel)** | Spawn N focused sub-queries; each agent researches one angle |
 | **Synthesis** | Merge research outputs into structured report with citations |
@@ -159,7 +159,7 @@ flowchart LR
 
 - Single-user auth (Clerk)
 - Web search ingestion (Tavily or SerpAPI)
-- Qdrant vector store
+- Postgres + pgvector for embeddings and metadata
 - 3–5 parallel research agents
 - EventBridge + SQS orchestration
 - Step Functions for research fan-out
@@ -172,7 +172,7 @@ flowchart LR
 |---------|-------|
 | PDF / document upload ingestion | S3 + Textract |
 | Custom knowledge bases | User-uploaded corpora |
-| PGVector fallback | Simpler ops, single DB |
+| Dedicated vector DB (Qdrant) | If pgvector ANN limits hit at scale |
 | Temporal migration | If Step Functions limits hit |
 | Team workspaces | Multi-tenant org model |
 | Scheduled research | Cron-triggered recurring queries |

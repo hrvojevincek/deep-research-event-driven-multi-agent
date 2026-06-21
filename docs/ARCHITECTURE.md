@@ -44,8 +44,7 @@ flowchart TB
     end
 
     subgraph Data
-        PG[(Postgres RDS)]
-        QD[(Qdrant)]
+        PG[(Postgres + pgvector)]
         S3[(S3 Artifacts)]
     end
 
@@ -64,7 +63,7 @@ flowchart TB
     EB --> SQS1 --> W1
     W1 --> EB
     EB --> SQS2 --> W2
-    W2 --> QD
+    W2 --> PG
     W2 --> EB
     EB --> SQS3 --> W3
     W3 --> PG
@@ -119,15 +118,15 @@ Each worker is a **long-polling SQS consumer** (or Lambda for lighter stages in 
 1. Receive message with `event_id`, `correlation_id`, `job_id`, `payload`
 2. Check idempotency (processed events table)
 3. Execute agent logic with OTEL span
-4. Persist results to Postgres / Qdrant
+4. Persist results to Postgres (including pgvector embeddings)
 5. Publish next-stage event to EventBridge
 6. Delete SQS message on success; leave for retry on failure
 
 | Worker | Input Event | Output Event | External Deps |
 |--------|-------------|--------------|---------------|
 | Ingestion | `query.submitted` | `ingestion.completed` | Tavily API |
-| Embedding | `ingestion.completed` | `embedding.completed` | OpenAI embeddings, Qdrant |
-| Knowledge | `embedding.completed` | `knowledge.mined` | Qdrant search, LLM |
+| Embedding | `ingestion.completed` | `embedding.completed` | OpenAI embeddings, pgvector |
+| Knowledge | `embedding.completed` | `knowledge.mined` | pgvector similarity search, LLM |
 | Research | `research.task.dispatched` | `research.task.completed` | LLM, web search |
 | Synthesis | all research done | `synthesis.completed` | LLM |
 
@@ -146,8 +145,7 @@ Each worker is a **long-polling SQS consumer** (or Lambda for lighter stages in 
 
 | Store | Data |
 |-------|------|
-| **Postgres** | Users, jobs, stages, sources, llm_usage, processed_events |
-| **Qdrant** | Document chunks + embeddings (collection per job or shared with job_id filter) |
+| **Postgres + pgvector** | Users, jobs, stages, sources, llm_usage, processed_events, document chunks + embeddings |
 | **S3** | Raw fetched documents, final synthesis artifacts (optional) |
 
 ---
@@ -178,7 +176,7 @@ sequenceDiagram
     I-->>UI: stage update via SSE
 
     EB->>E: via SQS
-    E->>E: Chunk + embed → Qdrant
+    E->>E: Chunk + embed → Postgres (pgvector)
     E->>EB: embedding.completed
 
     EB->>K: via SQS
@@ -218,8 +216,7 @@ flowchart LR
 
     subgraph Storage
         S3R[(S3: raw)]
-        QD[(Qdrant: vectors)]
-        PGR[(Postgres: metadata)]
+        PGR[(Postgres: metadata + vectors)]
         S3S[(S3: report)]
     end
 
@@ -227,7 +224,7 @@ flowchart LR
     DOC --> S3R
     DOC --> CHK
     CHK --> EMB
-    EMB --> QD
+    EMB --> PGR
     EMB --> KG
     KG --> PGR
     KG --> RES
@@ -308,7 +305,7 @@ flowchart LR
 | SQS | LocalStack | AWS SQS |
 | Step Functions | LocalStack (limited) | AWS Step Functions |
 | Postgres | Docker postgres:16 | RDS PostgreSQL |
-| Qdrant | Docker qdrant | Qdrant Cloud or self-hosted ECS |
+| Postgres + pgvector | Docker `pgvector/pgvector:pg16` | RDS PostgreSQL with `vector` extension |
 | Workers | `docker compose` sidecar | ECS Fargate (auto-scaling on queue depth) |
 | API | Uvicorn hot-reload | ECS Fargate behind ALB |
 | Frontend | `next dev` | Vercel or CloudFront + S3 |
@@ -324,7 +321,7 @@ See `docs/TECH_DECISIONS.md` for full ADRs. Summary:
 2. **EventBridge over direct HTTP** — decoupling, replay, audit trail
 3. **SQS per stage** — independent scaling and failure domains
 4. **Step Functions for fan-out** — visual workflow, built-in retry/wait
-5. **Qdrant over PGVector** — better ANN performance; PGVector as documented fallback
+5. **pgvector in Postgres** — single store for MVP; dedicated vector DB (Qdrant) as future scale path
 6. **SSE over WebSocket** — unidirectional updates sufficient for MVP
 
 ---
@@ -339,5 +336,5 @@ GET    /api/v1/queries/{id}/stream  # SSE pipeline events
 GET    /api/v1/queries/{id}/cost    # LLM cost breakdown
 POST   /api/v1/admin/dlq/replay     # Replay DLQ message (admin)
 GET    /api/v1/health               # Health check
-GET    /api/v1/health/ready         # Readiness (DB, Qdrant, EB)
+GET    /api/v1/health/ready         # Readiness (DB + pgvector, EB)
 ```

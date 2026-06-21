@@ -27,7 +27,7 @@ When an issue closes → check the matching box below and ensure `KRE-xxx` link 
 - [x] Create `docs/TECH_DECISIONS.md`
 - [x] Create `docs/TASKS.md`
 - [x] Create `docs/LOCAL_DEV.md`
-- [x] Add `docker-compose.yml` (Postgres, Qdrant, LocalStack)
+- [x] Add `docker-compose.yml` (Postgres + pgvector, LocalStack)
 - [x] Add `.env.example`, `.gitignore`, `Makefile`, `README.md`
 - [x] Add LocalStack init script for EventBridge + SQS
 - [x] Create Linear EventForge project + Phase 0/1 issues (`docs/LINEAR.md`)
@@ -95,7 +95,7 @@ When an issue closes → check the matching box below and ensure `KRE-xxx` link 
 
 - [ ] SQS consumer base class (long-poll, retry, DLQ)
 - [ ] Ingestion worker (mock: generate fake sources)
-- [ ] Embedding worker (mock: store fake chunks in Qdrant)
+- [ ] Embedding worker (mock: store fake chunks in Postgres via pgvector)
 - [ ] Knowledge mining worker (mock: extract fake entities)
 - [ ] Research worker (mock: generate fake research notes)
 - [ ] Synthesis worker (mock: combine into markdown report)

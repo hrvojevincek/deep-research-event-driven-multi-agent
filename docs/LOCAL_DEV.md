@@ -10,7 +10,7 @@ How to run EventForge locally using Docker Compose, LocalStack, and native dev s
 
 | Tool | Version | Purpose |
 |------|---------|---------|
-| Docker Desktop | 4.x+ | Containers for Postgres, Qdrant, LocalStack |
+| Docker Desktop | 4.x+ | Containers for Postgres (pgvector), LocalStack |
 | Node.js | 20 LTS | Frontend dev server |
 | Python | 3.12+ | Backend dev server |
 | uv (recommended) | latest | Python package management |
@@ -33,18 +33,14 @@ make dev
 ```
 
 This starts:
-- **Postgres** on `localhost:5432`
-- **Qdrant** on `localhost:6333` (REST), `6334` (gRPC)
+- **Postgres** (with pgvector) on `localhost:5432`
 - **LocalStack** on `localhost:4566` (EventBridge, SQS, Step Functions, S3)
 
 ### Verify Services
 
 ```bash
-# Postgres
+# Postgres (includes pgvector extension)
 docker compose exec postgres pg_isready -U eventforge
-
-# Qdrant
-curl http://localhost:6333/healthz
 
 # LocalStack
 curl http://localhost:4566/_localstack/health
@@ -71,13 +67,12 @@ Key local values (defaults work for Docker Compose):
 | Variable | Local Value |
 |----------|-------------|
 | `POSTGRES_HOST` | `localhost` (or `postgres` inside Docker network) |
-| `QDRANT_HOST` | `localhost` (or `qdrant` inside Docker network) |
 | `AWS_ENDPOINT_URL` | `http://localhost:4566` |
 | `AWS_ACCESS_KEY_ID` | `test` |
 | `AWS_SECRET_ACCESS_KEY` | `test` |
 | `NEXT_PUBLIC_API_URL` | `http://localhost:8000` |
 
-When running backend **inside** docker-compose, use service names (`postgres`, `qdrant`, `localstack`) as hosts. When running **natively** on your machine, use `localhost`.
+When running backend **inside** docker-compose, use service names (`postgres`, `localstack`) as hosts. When running **natively** on your machine, use `localhost`.
 
 ---
 
@@ -99,7 +94,6 @@ Uncomment `backend` and `frontend` services in `docker-compose.yml` first.
 | Backend API | http://localhost:8000 |
 | API docs | http://localhost:8000/docs |
 | Postgres | localhost:5432 |
-| Qdrant | localhost:6333 |
 | LocalStack | localhost:4566 |
 
 ### Option B: Hybrid (recommended for active development)
@@ -108,7 +102,7 @@ Run infrastructure in Docker; run app code natively for hot-reload.
 
 ```bash
 # Terminal 1: infrastructure only
-docker compose up postgres qdrant localstack
+docker compose up postgres localstack
 
 # Terminal 2: backend
 cd backend
@@ -179,19 +173,17 @@ cd backend && uv run alembic upgrade head
 
 ---
 
-## Qdrant
+## pgvector
 
-### Dashboard
+The Postgres image includes the `vector` extension. It is enabled via Alembic migration in Phase 1 (`CREATE EXTENSION IF NOT EXISTS vector`).
 
-Qdrant Web UI: http://localhost:6333/dashboard
+Document chunks and embeddings are stored in Postgres (not a separate vector DB). Similarity search uses pgvector HNSW or IVFFlat indexes.
 
-### Health Check
+### Verify extension (Phase 1+)
 
 ```bash
-curl http://localhost:6333/healthz
+docker compose exec postgres psql -U eventforge -d eventforge -c "SELECT extname FROM pg_extension WHERE extname = 'vector';"
 ```
-
-Collections are created programmatically by the embedding worker (Phase 2).
 
 ---
 

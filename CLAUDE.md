@@ -23,12 +23,12 @@ Deep reference (read on demand): `docs/ARCHITECTURE.md`, `docs/PRD.md`, `docs/TE
 
 ## Stack
 
-Next.js 15 + FastAPI + EventBridge/SQS/Step Functions + Postgres + Qdrant + Clerk + OpenTelemetry + Terraform
+Next.js 15 + FastAPI + EventBridge/SQS/Step Functions + Postgres (pgvector) + Clerk + OpenTelemetry + Terraform
 
 ## Commands
 
 ```bash
-./scripts/setup-local.sh && make dev   # infra: Postgres, Qdrant, LocalStack
+./scripts/setup-local.sh && make dev   # infra: Postgres (pgvector), LocalStack
 make down / make logs
 ```
 

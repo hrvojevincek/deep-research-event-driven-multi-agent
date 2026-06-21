@@ -31,7 +31,7 @@ Define JSON Schema in `shared/events/` first. Mirror as Pydantic in `backend/src
 | Event in | Worker | Event out | Stores |
 |----------|--------|-----------|--------|
 | query.submitted | Ingestion | ingestion.completed | sources → Postgres |
-| ingestion.completed | Embedding | embedding.completed | vectors → Qdrant |
+| ingestion.completed | Embedding | embedding.completed | vectors → Postgres (pgvector) |
 | embedding.completed | Knowledge | knowledge.mined | entities → Postgres |
 | research.task.dispatched | Research | research.task.completed | notes → Postgres |
 | all research done | Synthesis | synthesis.completed | report → Postgres |

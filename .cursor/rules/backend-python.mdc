@@ -36,7 +36,7 @@ eventforge/
 ## API conventions
 
 - Prefix: `/api/v1`
-- Health: `GET /health`, `GET /health/ready` (checks DB, Qdrant, EB)
+- Health: `GET /health`, `GET /health/ready` (checks DB + pgvector, EB)
 - SSE: `GET /api/v1/queries/{id}/stream` for pipeline updates
 
 ## Worker pattern
@@ -45,7 +45,7 @@ eventforge/
 # 1. Receive SQS message
 # 2. Check processed_events(event_id) — skip if exists
 # 3. Process with OTEL span
-# 4. Persist results (Postgres / Qdrant)
+# 4. Persist results (Postgres, including pgvector embeddings)
 # 5. Publish next event to EventBridge
 # 6. Delete message; on failure leave for retry → DLQ
 ```

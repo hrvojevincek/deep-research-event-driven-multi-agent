@@ -3,7 +3,7 @@
 
 services:
   postgres:
-    image: postgres:16-alpine
+    image: pgvector/pgvector:pg16
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-eventforge}
       POSTGRES_USER: ${POSTGRES_USER:-eventforge}
@@ -17,14 +17,6 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
-
-  qdrant:
-    image: qdrant/qdrant:v1.12.5
-    ports:
-      - "${QDRANT_PORT:-6333}:6333"
-      - "6334:6334"
-    volumes:
-      - qdrant_data:/qdrant/storage
 
   localstack:
     image: localstack/localstack:3.8
@@ -47,8 +39,6 @@ services:
   #   depends_on:
   #     postgres:
   #       condition: service_healthy
-  #     qdrant:
-  #       condition: service_started
   #     localstack:
   #       condition: service_started
   #   volumes:
@@ -77,5 +67,4 @@ services:
 
 volumes:
   postgres_data:
-  qdrant_data:
   localstack_data:

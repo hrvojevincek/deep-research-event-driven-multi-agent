@@ -87,9 +87,9 @@ Pipeline has 5+ stages with parallel research fan-out. Need decoupling, retries,
 
 ---
 
-## ADR-003: Postgres + Qdrant (Dual Store)
+## ADR-003: Postgres + pgvector (Single Store)
 
-**Status:** Accepted  
+**Status:** Accepted (revised 2026-06-21)  
 **Date:** 2025-06-20
 
 ### Context
@@ -98,23 +98,32 @@ Need relational metadata (users, jobs, costs) and vector similarity search for R
 
 ### Decision
 
-- **Postgres 16** — primary OLTP store (RDS in prod)
-- **Qdrant** — vector store for embeddings
+- **Postgres 16 with pgvector** — primary OLTP store and vector similarity search (RDS in prod)
 
 ### Rationale
 
-- Postgres excels at structured data, transactions, job state
-- Qdrant provides fast ANN search, filtering by `job_id`, good local Docker story
-- Separation keeps concerns clean
+- Single database simplifies local dev and operations
+- pgvector provides sufficient ANN search for MVP scale with filtering by `job_id`
+- ACID transactions across metadata and vectors in one store
+- One fewer service in Docker Compose
 
 ### Trade-offs
 
-- Two databases to operate
-- No ACID across vector + relational writes (mitigated by event-driven eventual consistency)
+- ANN performance below dedicated vector DBs at very large scale
+- HNSW index tuning may be needed as corpus grows
 
-### Fallback: PGVector
+### Alternatives Considered
 
-If operational simplicity becomes priority, migrate vectors to `pgvector` extension. Documented migration path; abstract vector store behind `VectorStoreProtocol` interface in backend.
+| Option | Pros | Cons | Verdict |
+|--------|------|------|---------|
+| **Qdrant** | Fast ANN, payload filtering | Extra service, dual-store ops | Rejected for MVP; revisit at scale |
+| **Pinecone / managed vector DB** | Zero ops, fast search | Vendor lock-in, cost | Deferred |
+
+### Implementation
+
+- Enable `vector` extension via Alembic migration
+- Store document chunks + embeddings in Postgres (e.g. `document_chunks` table)
+- Abstract vector access behind `VectorStoreProtocol` in backend for future migration if needed
 
 ---
 
@@ -207,7 +216,7 @@ infra/terraform/
 
 ### Decision
 
-Docker Compose orchestrates Postgres, Qdrant, LocalStack locally. Backend and frontend can run natively or in Compose.
+Docker Compose orchestrates Postgres (with pgvector), LocalStack locally. Backend and frontend can run natively or in Compose.
 
 ### Rationale
 
@@ -313,7 +322,7 @@ Log every LLM call to `llm_usage` table: `job_id`, `agent_name`, `model`, `input
 |-----|-------|--------|
 | 001 | Hybrid Next.js + FastAPI | Accepted |
 | 002 | EventBridge + SQS + Step Functions | Accepted |
-| 003 | Postgres + Qdrant | Accepted |
+| 003 | Postgres + pgvector | Accepted |
 | 004 | Clerk Auth | Accepted |
 | 005 | OpenTelemetry | Accepted |
 | 006 | Terraform IaC | Accepted |
