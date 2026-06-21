@@ -1,0 +1,38 @@
+---
+description: Infrastructure — Docker Compose, LocalStack, Terraform AWS modules
+globs: infra/**,docker-compose.yml,scripts/**,.env.example
+alwaysApply: false
+---
+
+# Infrastructure
+
+## Local (Docker Compose)
+
+| Service | Port | Purpose |
+|---------|------|---------|
+| postgres | 5432 | Postgres 16 |
+| qdrant | 6333 | Vector store |
+| localstack | 4566 | EventBridge, SQS, Step Functions, S3 |
+
+Init script: `infra/docker/localstack/init/01-eventforge.sh` creates bus + queues.
+
+**Host naming:** native dev → `localhost`; inside compose → service names (`postgres`, `qdrant`, `localstack`).
+
+## Terraform (`infra/terraform/`)
+
+```
+modules/{networking,rds,eventbridge,sqs,step-functions,ecs,observability}
+environments/{dev,prod}
+```
+
+- Least-privilege IAM per worker (SQS consume, EB publish, S3 read/write)
+- Secrets in AWS Secrets Manager (not in tfvars)
+- Phase 5 — don't scaffold AWS until pipeline works locally
+
+## LocalStack limits
+
+Step Functions Map state is limited locally. Use simplified research fan-out in Phase 2; real SF in Phase 5.
+
+## OTEL (Phase 3+)
+
+Collector config in `infra/docker/otel/`. Export via OTLP gRPC `:4317`.

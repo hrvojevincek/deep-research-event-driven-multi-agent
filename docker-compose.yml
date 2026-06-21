@@ -1,0 +1,81 @@
+# EventForge — Local development stack
+# Full setup guide: docs/LOCAL_DEV.md
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-eventforge}
+      POSTGRES_USER: ${POSTGRES_USER:-eventforge}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-eventforge}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  qdrant:
+    image: qdrant/qdrant:v1.12.5
+    ports:
+      - "${QDRANT_PORT:-6333}:6333"
+      - "6334:6334"
+    volumes:
+      - qdrant_data:/qdrant/storage
+
+  localstack:
+    image: localstack/localstack:3.8
+    ports:
+      - "4566:4566"
+    environment:
+      SERVICES: events,sqs,stepfunctions,s3,secretsmanager
+      DEBUG: ${LOCALSTACK_DEBUG:-0}
+      PERSISTENCE: 1
+    volumes:
+      - localstack_data:/var/lib/localstack
+      - ./infra/docker/localstack/init:/etc/localstack/init/ready.d
+
+  # Uncomment when backend is scaffolded (Phase 1)
+  # backend:
+  #   build: ./backend
+  #   ports:
+  #     - "8000:8000"
+  #   env_file: .env
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
+  #     qdrant:
+  #       condition: service_started
+  #     localstack:
+  #       condition: service_started
+  #   volumes:
+  #     - ./backend:/app
+
+  # Uncomment when frontend is scaffolded (Phase 1)
+  # frontend:
+  #   build: ./frontend
+  #   ports:
+  #     - "3000:3000"
+  #   env_file: .env
+  #   depends_on:
+  #     - backend
+  #   volumes:
+  #     - ./frontend:/app
+  #     - /app/node_modules
+
+  # Uncomment when OTEL collector is configured (Phase 3)
+  # otel-collector:
+  #   image: otel/opentelemetry-collector-contrib:0.114.0
+  #   ports:
+  #     - "4317:4317"
+  #     - "4318:4318"
+  #   volumes:
+  #     - ./infra/docker/otel/otel-collector-config.yaml:/etc/otelcol-contrib/config.yaml
+
+volumes:
+  postgres_data:
+  qdrant_data:
+  localstack_data:

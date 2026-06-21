@@ -1,0 +1,324 @@
+# EventForge — Technology Decisions (ADRs)
+
+> **Cursor agents:** Consult before changing stack. Summary in `.cursor/rules/eventforge-core.mdc`. Update this file when making new architectural decisions.
+
+Architecture Decision Records documenting key choices, trade-offs, and rationale.
+
+**Format:** Status · Date · Decision
+
+---
+
+## ADR-001: Hybrid Stack — Next.js Frontend + FastAPI Backend
+
+**Status:** Accepted  
+**Date:** 2025-06-20
+
+### Context
+
+Need a portfolio project demonstrating both polished UX and robust backend/agent engineering.
+
+### Decision
+
+- **Frontend:** Next.js 15 (App Router, TypeScript)
+- **Backend:** Python FastAPI
+
+### Rationale
+
+| Factor | Next.js | FastAPI |
+|--------|---------|---------|
+| React Flow integration | Native | N/A |
+| shadcn/ui ecosystem | Excellent | N/A |
+| LLM / ML libraries | Limited | Rich (LangChain, LlamaIndex, native SDKs) |
+| Async workers | Node can, but Python dominates AI | First-class |
+| Type safety | TypeScript | Pydantic v2 |
+| Hiring signal | Full-stack UX | Backend / ML engineering |
+
+### Trade-offs
+
+- Two runtimes to deploy and maintain
+- Shared types require OpenAPI codegen pipeline
+- Slightly more complex local dev (mitigated by Docker Compose)
+
+### Alternatives Considered
+
+- **Full Next.js** — API routes + BullMQ workers. Rejected: weaker Python AI ecosystem.
+- **Full Python (Django + HTMX)** — Rejected: weaker portfolio UX impact, no React Flow.
+- **T3 stack** — Rejected: doesn't showcase Python backend skills.
+
+---
+
+## ADR-002: AWS EventBridge + SQS + Step Functions
+
+**Status:** Accepted  
+**Date:** 2025-06-20
+
+### Context
+
+Pipeline has 5+ stages with parallel research fan-out. Need decoupling, retries, and observability.
+
+### Decision
+
+- **EventBridge** — event routing and audit log
+- **SQS** — per-stage worker queues with DLQ
+- **Step Functions** — research fan-out orchestration (Map state)
+
+### Rationale
+
+- Industry-standard serverless event patterns
+- Independent scaling per queue
+- DLQ built into SQS
+- Step Functions Map state handles parallel research cleanly
+- Strong portfolio signal for cloud-native architecture
+
+### Trade-offs
+
+- LocalStack emulation is imperfect (especially Step Functions)
+- More IaC complexity than a monolithic job queue
+- Eventual consistency between stages
+
+### Alternatives Considered
+
+| Option | Pros | Cons | Verdict |
+|--------|------|------|---------|
+| **Temporal** | Excellent durability, code-first workflows | Extra infrastructure, steeper learning curve | Future migration path (ADR-008) |
+| **Celery + Redis** | Simple local dev | Not cloud-native, weaker portfolio signal | Rejected for prod |
+| **Pure SQS chaining** | Simpler | No native fan-out/wait | Rejected; SF needed for research |
+| **Kafka** | High throughput | Overkill for MVP, ops burden | Rejected |
+
+---
+
+## ADR-003: Postgres + Qdrant (Dual Store)
+
+**Status:** Accepted  
+**Date:** 2025-06-20
+
+### Context
+
+Need relational metadata (users, jobs, costs) and vector similarity search for RAG.
+
+### Decision
+
+- **Postgres 16** — primary OLTP store (RDS in prod)
+- **Qdrant** — vector store for embeddings
+
+### Rationale
+
+- Postgres excels at structured data, transactions, job state
+- Qdrant provides fast ANN search, filtering by `job_id`, good local Docker story
+- Separation keeps concerns clean
+
+### Trade-offs
+
+- Two databases to operate
+- No ACID across vector + relational writes (mitigated by event-driven eventual consistency)
+
+### Fallback: PGVector
+
+If operational simplicity becomes priority, migrate vectors to `pgvector` extension. Documented migration path; abstract vector store behind `VectorStoreProtocol` interface in backend.
+
+---
+
+## ADR-004: Clerk for Authentication
+
+**Status:** Accepted (MVP)  
+**Date:** 2025-06-20
+
+### Context
+
+Need auth without building identity from scratch. FastAPI validates JWTs.
+
+### Decision
+
+Use **Clerk** for frontend auth; FastAPI validates Clerk JWT via JWKS.
+
+### Rationale
+
+- Fastest path to secure, polished auth UI
+- Good Next.js integration
+- JWT standard works with FastAPI dependency injection
+
+### Alternatives
+
+- **Auth0** — viable, slightly heavier
+- **NextAuth + custom** — more code, less portfolio cloud signal
+- **Supabase Auth** — good if we used Supabase DB; we're on RDS
+
+---
+
+## ADR-005: OpenTelemetry for Observability
+
+**Status:** Accepted  
+**Date:** 2025-06-20
+
+### Decision
+
+Instrument all services with **OpenTelemetry** SDK; export via OTLP to collector.
+
+### Rationale
+
+- Vendor-neutral; works locally and on AWS (ADOT)
+- Distributed tracing across agents is a core portfolio feature
+- Correlate traces with `correlation_id` and `job_id` attributes
+
+### Implementation Notes
+
+- Python: `opentelemetry-instrumentation-fastapi`, custom spans in agents
+- Next.js: `@opentelemetry/sdk` (Phase 3)
+- Collector → Grafana Cloud free tier or AWS X-Ray
+
+---
+
+## ADR-006: Terraform for Infrastructure as Code
+
+**Status:** Accepted  
+**Date:** 2025-06-20
+
+### Decision
+
+Use **Terraform** with modular structure (`infra/terraform/modules/`).
+
+### Rationale
+
+- Industry standard, portable skill
+- Clear module boundaries: networking, RDS, SQS, EventBridge, ECS, IAM
+- Works well in portfolio README
+
+### Alternatives
+
+- **AWS CDK** — great for TypeScript teams; we're Python-primary on backend
+- **Pulumi** — viable; smaller community for AWS examples
+- **Serverless Framework** — too narrow for ECS + RDS
+
+### Structure
+
+```
+infra/terraform/
+├── environments/dev/
+├── environments/prod/
+└── modules/{networking,rds,eventbridge,sqs,step-functions,ecs,observability}
+```
+
+---
+
+## ADR-007: Docker Compose for Local Development
+
+**Status:** Accepted  
+**Date:** 2025-06-20
+
+### Decision
+
+Docker Compose orchestrates Postgres, Qdrant, LocalStack locally. Backend and frontend can run natively or in Compose.
+
+### Rationale
+
+- One command (`make dev`) for infrastructure dependencies
+- LocalStack approximates AWS events locally
+- Matches production service topology
+
+### Limitations
+
+- LocalStack Step Functions support is limited — may use simplified fan-out locally
+- Document workarounds in `docs/LOCAL_DEV.md`
+
+---
+
+## ADR-008: Temporal as Future Migration Path
+
+**Status:** Proposed (not implemented)  
+**Date:** 2025-06-20
+
+### Context
+
+If Step Functions + EventBridge complexity grows (human-in-the-loop, long-running sagas, complex compensation).
+
+### Proposal
+
+Migrate orchestration to **Temporal** on AWS (Temporal Cloud or self-hosted ECS).
+
+### Trigger Conditions
+
+- Need durable timers > 1 year
+- Complex saga compensation logic
+- Step Functions cost or expressiveness limits hit
+- Want code-first workflows with full testability
+
+### Migration Strategy
+
+- Keep event schemas in `shared/events/`
+- Replace Step Functions with Temporal workflows
+- Workers become Temporal activities
+- EventBridge remains for external integrations
+
+---
+
+## ADR-009: Tavily for Web Search Ingestion
+
+**Status:** Accepted (MVP)  
+**Date:** 2025-06-20
+
+### Decision
+
+Use **Tavily API** for research-focused web search during ingestion.
+
+### Rationale
+
+- Built for AI/RAG pipelines
+- Simple API, good relevance
+- Alternative: SerpAPI (broader but more expensive)
+
+---
+
+## ADR-010: SSE for Real-Time UI Updates
+
+**Status:** Accepted (MVP)  
+**Date:** 2025-06-20
+
+### Decision
+
+Use **Server-Sent Events** from FastAPI for pipeline status streaming.
+
+### Rationale
+
+- Unidirectional (server → client) is sufficient
+- Simpler than WebSocket; works through most proxies
+- FastAPI `EventSourceResponse` is well-supported
+
+### Revisit If
+
+- Bidirectional client → server signaling needed during pipeline
+- Multiple event types with binary payloads required
+
+---
+
+## ADR-011: LLM Cost Tracking
+
+**Status:** Accepted  
+**Date:** 2025-06-20
+
+### Decision
+
+Log every LLM call to `llm_usage` table: `job_id`, `agent_name`, `model`, `input_tokens`, `output_tokens`, `cost_usd`.
+
+### Rationale
+
+- Cost awareness is a production differentiator
+- Enables per-user budgets and portfolio demo of FinOps thinking
+- Calculate cost from published model pricing in config (not hardcoded in agents)
+
+---
+
+## Decision Log
+
+| ADR | Title | Status |
+|-----|-------|--------|
+| 001 | Hybrid Next.js + FastAPI | Accepted |
+| 002 | EventBridge + SQS + Step Functions | Accepted |
+| 003 | Postgres + Qdrant | Accepted |
+| 004 | Clerk Auth | Accepted |
+| 005 | OpenTelemetry | Accepted |
+| 006 | Terraform IaC | Accepted |
+| 007 | Docker Compose Local Dev | Accepted |
+| 008 | Temporal Migration Path | Proposed |
+| 009 | Tavily Web Search | Accepted |
+| 010 | SSE Real-Time | Accepted |
+| 011 | LLM Cost Tracking | Accepted |

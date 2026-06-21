@@ -1,0 +1,77 @@
+---
+description: EventForge core context — stack, architecture, commands, agent behavior
+alwaysApply: true
+---
+
+# EventForge — Cursor Agent Context
+
+Event-driven multi-agent research platform. Users submit queries → EventBridge pipeline (ingestion → embedding → knowledge → parallel research → synthesis) → dashboard with live React Flow.
+
+**Portfolio goal:** production patterns — scalability, resilience, observability, cost awareness.
+
+## Stack
+
+| Layer | Tech |
+|-------|------|
+| Frontend | Next.js 15 App Router, TS, Tailwind, shadcn/ui, React Flow |
+| Backend | Python 3.12+, FastAPI, Pydantic v2, SQLAlchemy 2.0 |
+| Events | AWS EventBridge + SQS + Step Functions |
+| Data | Postgres 16 + Qdrant (PGVector fallback) |
+| Auth | Clerk JWT → FastAPI validation |
+| Observability | OpenTelemetry → OTLP |
+| IaC | Terraform (`infra/terraform/`) |
+| Local | Docker Compose + LocalStack |
+
+## Layout
+
+- `frontend/` — Next.js
+- `backend/src/eventforge/` — api, agents, workers, events, db, core, services
+- `shared/events/` — JSON Schema contracts (define here first)
+- `docs/` — PRD, ARCHITECTURE, TECH_DECISIONS, TASKS, LOCAL_DEV
+
+## Commands
+
+```bash
+./scripts/setup-local.sh   # first time
+make dev                   # Postgres + Qdrant + LocalStack
+make down / make logs
+```
+
+Phase 1+: `uv run uvicorn eventforge.main:app --reload` (backend), `npm run dev` (frontend)
+
+## Architecture (non-negotiable)
+
+- **Event-first:** agents communicate via EventBridge, not direct HTTP
+- **Idempotency:** check `event_id` before processing (`processed_events` table)
+- **DLQ:** `eventforge-dlq` for terminal failures
+- **Correlation:** `correlation_id` threads query through all stages + OTEL + SSE
+- **Cost tracking:** log tokens to `llm_usage` per agent call
+
+## Naming
+
+- Bus: `eventforge-bus` | Queues: `eventforge-{stage}` | Package: `eventforge` | API: `/api/v1`
+
+## Agent behavior
+
+1. Minimize scope — surgical diffs, match existing conventions
+2. No secrets in code — `.env` / AWS Secrets Manager
+3. Event schemas in `shared/events/` → mirror as Pydantic models
+4. Update `docs/TASKS.md` checkboxes when completing work
+5. Commit only when user explicitly asks
+6. Read `docs/ARCHITECTURE.md` for diagrams; `docs/TASKS.md` for current phase
+
+## User shortcuts
+
+- "What's next in EventForge?" → Linear MCP `list_issues(project: EventForge)`, suggest unblocked issue
+- "Implement KRE-xxx" → `get_issue` → implement acceptance criteria
+- "Implement Phase N" → follow `docs/TASKS.md` phase N
+- "Mark KRE-xxx done" → close in Linear + check `docs/TASKS.md` box
+
+## Linear
+
+- **Project:** [EventForge](https://linear.app/kreativbiro/project/eventforge-f35070f0931e) on team `Kreativbiro`
+- **Active work:** Linear MCP (`list_issues`, `get_issue`) — not just markdown
+- **Mirror:** `docs/TASKS.md` + `docs/LINEAR.md` issue index
+- **Next issue:** [KRE-117](https://linear.app/kreativbiro/issue/KRE-117) (Close Phase 0)
+
+**Phase status:** Phase 0 almost done. Start with KRE-117, then parallel KRE-118 + KRE-119.

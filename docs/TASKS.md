@@ -1,0 +1,275 @@
+# EventForge — Task Roadmap
+
+> **Cursor agents:** Check current phase here before implementing. Update checkboxes when done. Workflow rule: `.cursor/rules/docs-workflow.mdc`.
+
+Living roadmap for EventForge development. Structured for **Linear integration** — each phase maps to a Milestone; checkbox items map to Issues.
+
+**Linear (active):** [EventForge project](https://linear.app/kreativbiro/project/eventforge-f35070f0931e) — see `docs/LINEAR.md` for issue index.
+
+**How to use:**
+> "What's next in EventForge?" · "Implement KRE-118" · "Mark KRE-117 done"
+
+When an issue closes → check the matching box below and ensure `KRE-xxx` link is present.
+
+---
+
+## Phase 0: Foundation & Documentation
+
+**Goal:** Project structure, documentation, and local infrastructure skeleton.  
+**Status:** In Progress
+
+- [x] Define folder structure and repo scaffold
+- [x] Create `CLAUDE.md` (AI context)
+- [x] Create `.cursor/rules/` (Cursor IDE agent rules)
+- [x] Create `AGENTS.md` (Cursor agent entry point)
+- [x] Create `docs/PRD.md`
+- [x] Create `docs/ARCHITECTURE.md`
+- [x] Create `docs/TECH_DECISIONS.md`
+- [x] Create `docs/TASKS.md`
+- [x] Create `docs/LOCAL_DEV.md`
+- [x] Add `docker-compose.yml` (Postgres, Qdrant, LocalStack)
+- [x] Add `.env.example`, `.gitignore`, `Makefile`, `README.md`
+- [x] Add LocalStack init script for EventBridge + SQS
+- [x] Create Linear EventForge project + Phase 0/1 issues (`docs/LINEAR.md`)
+- [ ] Initialize git repository and first commit → [KRE-117](https://linear.app/kreativbiro/issue/KRE-117)
+- [ ] Verify `make dev` starts infrastructure cleanly → [KRE-117](https://linear.app/kreativbiro/issue/KRE-117)
+
+---
+
+## Phase 1: Application Scaffolding
+
+**Goal:** Runnable Next.js frontend and FastAPI backend with health checks and DB connection.
+
+### 1.1 Backend Scaffold
+
+→ [KRE-118](https://linear.app/kreativbiro/issue/KRE-118) · [KRE-120](https://linear.app/kreativbiro/issue/KRE-120) · [KRE-123](https://linear.app/kreativbiro/issue/KRE-123) · [KRE-125](https://linear.app/kreativbiro/issue/KRE-125)
+
+- [ ] Initialize `backend/` with `pyproject.toml` (uv) — KRE-118
+- [ ] Create `src/eventforge/` package structure — KRE-118
+- [ ] FastAPI app with `/health` and `/health/ready` endpoints — KRE-120
+- [ ] SQLAlchemy 2.0 + Alembic setup — KRE-123
+- [ ] Core models: `User`, `Job`, `JobStage`, `ProcessedEvent` — KRE-123
+- [ ] Config via `pydantic-settings` from `.env` — KRE-125
+- [ ] Structured logging (JSON in prod, pretty in local) — KRE-125
+- [ ] Dockerfile for backend — KRE-125
+- [ ] Uncomment backend service in `docker-compose.yml` — KRE-125
+
+### 1.2 Frontend Scaffold
+
+→ [KRE-119](https://linear.app/kreativbiro/issue/KRE-119) · [KRE-121](https://linear.app/kreativbiro/issue/KRE-121) · [KRE-124](https://linear.app/kreativbiro/issue/KRE-124)
+
+- [ ] Initialize Next.js 15 with TypeScript, Tailwind, App Router — KRE-119
+- [ ] Install and configure shadcn/ui — KRE-119
+- [ ] Basic layout: header, sidebar, main content area — KRE-121
+- [ ] Placeholder pages: `/` (home), `/queries/new`, `/queries/[id]` — KRE-121
+- [ ] API client setup with env-based `NEXT_PUBLIC_API_URL` — KRE-124
+- [ ] Dockerfile for frontend — KRE-124
+- [ ] Uncomment frontend service in `docker-compose.yml` — KRE-124
+
+### 1.3 Shared Contracts
+
+→ [KRE-126](https://linear.app/kreativbiro/issue/KRE-126) · [KRE-122](https://linear.app/kreativbiro/issue/KRE-122) · [KRE-127](https://linear.app/kreativbiro/issue/KRE-127) · [KRE-128](https://linear.app/kreativbiro/issue/KRE-128)
+
+- [ ] OpenAPI spec generation from FastAPI — KRE-126
+- [ ] `openapi-typescript` codegen in frontend — KRE-126
+- [ ] Initial event JSON schemas in `shared/events/` — KRE-122
+- [ ] CI lint workflow (ruff + eslint) — KRE-127
+
+**Phase 1 exit criteria:** `make dev` runs full stack; health endpoints return 200; frontend renders placeholder UI. → [KRE-128](https://linear.app/kreativbiro/issue/KRE-128)
+
+---
+
+## Phase 2: Core Pipeline (Local)
+
+**Goal:** End-to-end query submission → event publishing → worker processing (mocked LLM) → DB persistence.
+
+### 2.1 API & Data Layer
+
+- [ ] `POST /api/v1/queries` — create job, emit `query.submitted`
+- [ ] `GET /api/v1/queries/{id}` — job detail with stages
+- [ ] `GET /api/v1/queries` — list user queries (mock user for now)
+- [ ] Event publisher module (EventBridge via boto3 / LocalStack)
+- [ ] Idempotency table + check logic
+
+### 2.2 Workers (Stub Agents)
+
+- [ ] SQS consumer base class (long-poll, retry, DLQ)
+- [ ] Ingestion worker (mock: generate fake sources)
+- [ ] Embedding worker (mock: store fake chunks in Qdrant)
+- [ ] Knowledge mining worker (mock: extract fake entities)
+- [ ] Research worker (mock: generate fake research notes)
+- [ ] Synthesis worker (mock: combine into markdown report)
+- [ ] Wire EventBridge rules → SQS queues (LocalStack)
+
+### 2.3 Orchestration
+
+- [ ] Sequential event chaining (ingestion → embedding → knowledge → research → synthesis)
+- [ ] Research fan-out: dispatch N tasks (simplified local — skip Step Functions initially)
+- [ ] DLQ handling + `pipeline.failed` event
+- [ ] Update `JobStage` status in Postgres at each step
+
+**Phase 2 exit criteria:** Submit query via API → all stages complete → result in DB (mocked LLM).
+
+---
+
+## Phase 3: Frontend Experience & Real-Time
+
+**Goal:** Interactive dashboard with live React Flow pipeline visualization.
+
+### 3.1 Real-Time Streaming
+
+- [ ] SSE endpoint: `GET /api/v1/queries/{id}/stream`
+- [ ] Publish stage events to SSE subscribers
+- [ ] Frontend `useJobStream` hook
+
+### 3.2 React Flow Visualization
+
+- [ ] Pipeline node components (pending, running, completed, failed)
+- [ ] Animated edges on active stage
+- [ ] Auto-layout pipeline graph
+- [ ] Stage detail panel on node click (duration, agent name)
+
+### 3.3 Dashboard UI
+
+- [ ] Query submission form (topic, depth, max_sources)
+- [ ] Results viewer (markdown rendering)
+- [ ] Source list with expandable snippets
+- [ ] Job history page
+
+### 3.3 Observability (Local)
+
+- [ ] OTEL SDK in FastAPI + workers
+- [ ] OTEL collector in docker-compose
+- [ ] Verify traces in local Jaeger or Grafana
+
+**Phase 3 exit criteria:** Submit query in UI → watch React Flow update live → view synthesis result.
+
+---
+
+## Phase 4: Real AI Agents & Auth
+
+**Goal:** Replace mocks with real LLM calls, web search, and user authentication.
+
+### 4.1 LLM Integration
+
+- [ ] LLM client abstraction (OpenAI + Anthropic)
+- [ ] Ingestion: Tavily web search
+- [ ] Embedding: OpenAI `text-embedding-3-small`
+- [ ] Knowledge mining: RAG retrieval + entity extraction
+- [ ] Research: parallel focused sub-queries with LLM
+- [ ] Synthesis: structured report generation with citations
+- [ ] Cost tracking (`llm_usage` table + API endpoint)
+
+### 4.2 Authentication
+
+- [ ] Clerk integration in Next.js
+- [ ] JWT validation middleware in FastAPI
+- [ ] User-scoped job queries
+- [ ] `user_id` on all job records
+
+### 4.3 Resilience Hardening
+
+- [ ] LLM retry with exponential backoff
+- [ ] Circuit breaker per provider
+- [ ] Per-query cost cap enforcement
+- [ ] SQS redrive policies to DLQ
+
+**Phase 4 exit criteria:** Real research query produces cited synthesis; auth enforced; costs tracked.
+
+---
+
+## Phase 5: AWS Deployment
+
+**Goal:** Production-grade deployment to AWS dev environment.
+
+### 5.1 Infrastructure (Terraform)
+
+- [ ] `modules/networking` — VPC, subnets, security groups
+- [ ] `modules/rds` — Postgres with backups
+- [ ] `modules/eventbridge` — event bus + rules
+- [ ] `modules/sqs` — queues + DLQ + redrive
+- [ ] `modules/step-functions` — research fan-out workflow
+- [ ] `modules/ecs` — API + worker services (Fargate)
+- [ ] `modules/observability` — CloudWatch, ADOT
+- [ ] `environments/dev` — compose modules
+- [ ] Secrets Manager for API keys
+
+### 5.2 CI/CD
+
+- [ ] GitHub Actions: lint + test on PR
+- [ ] Docker build + push to ECR
+- [ ] Terraform plan on PR, apply on merge to main
+- [ ] Frontend deploy to Vercel (or S3 + CloudFront)
+
+### 5.3 Step Functions
+
+- [ ] Research fan-out Map state
+- [ ] Wait for all research completions
+- [ ] Trigger synthesis on completion
+
+**Phase 5 exit criteria:** Deployed to AWS dev; end-to-end query works in cloud.
+
+---
+
+## Phase 6: Polish & Portfolio
+
+**Goal:** Demo-ready portfolio piece.
+
+- [ ] README with architecture diagram and demo GIF
+- [ ] Admin DLQ replay endpoint + simple UI
+- [ ] Playwright E2E test for happy path
+- [ ] Performance: P95 latency benchmarks
+- [ ] Cost dashboard panel in UI
+- [ ] Export synthesis as Markdown download
+- [ ] Demo seed script with impressive sample query
+
+---
+
+## Backlog (Post-MVP)
+
+- [ ] PDF / document upload ingestion (S3 + Textract)
+- [ ] PGVector migration option
+- [ ] Temporal orchestration migration (ADR-008)
+- [ ] Team workspaces / org model
+- [ ] Scheduled recurring research
+- [ ] Knowledge graph visualization (beyond pipeline flow)
+- [ ] Human-in-the-loop pipeline pauses
+- [ ] Bi-directional Linear sync (issue status → TASKS.md)
+- [ ] WebSocket upgrade if SSE insufficient
+- [ ] Multi-region considerations
+
+---
+
+## Linear Integration Template
+
+When creating Linear issues, use this format:
+
+```
+Title:       [Phase X.Y] <task description>
+Description: <acceptance criteria from checkbox>
+Labels:      phase-N, backend|frontend|infra|agents
+Priority:    P0–P3 (map from PRD)
+Estimate:    1–5 points
+Blocked by:  <dependency issue if any>
+```
+
+### Suggested Linear Project Structure
+
+```
+Project: EventForge
+├── Milestone: Phase 0 — Foundation
+├── Milestone: Phase 1 — Scaffolding
+├── Milestone: Phase 2 — Core Pipeline
+├── Milestone: Phase 3 — Frontend & Real-Time
+├── Milestone: Phase 4 — Real AI & Auth
+├── Milestone: Phase 5 — AWS Deployment
+└── Milestone: Phase 6 — Polish
+```
+
+---
+
+## Current Priority
+
+**Next up:** Complete Phase 0 verification, then **Phase 1 — Application Scaffolding**.
+
+Say: *"Implement Phase 1"* to begin backend and frontend initialization.

@@ -1,0 +1,48 @@
+---
+description: Event schemas, pipeline flow, idempotency, and agent stage contracts
+globs: shared/events/**,backend/**/events/**,backend/**/agents/**,backend/**/workers/**
+alwaysApply: false
+---
+
+# Event Pipeline
+
+## Flow
+
+```
+query.submitted → ingestion.completed → embedding.completed → knowledge.mined
+  → research.task.dispatched (×N) → research.task.completed (×N)
+  → synthesis.completed
+```
+
+Step Functions handles research fan-out in prod. Local: simplified sequential fan-out.
+
+## Event naming
+
+`eventforge.<domain>.<action>` — e.g. `eventforge.query.submitted`
+
+## Required fields (every event)
+
+`event_id`, `correlation_id`, `job_id`, `timestamp`, `schema_version`, `payload`
+
+Define JSON Schema in `shared/events/` first. Mirror as Pydantic in `backend/src/eventforge/events/schemas/`.
+
+## Stage map
+
+| Event in | Worker | Event out | Stores |
+|----------|--------|-----------|--------|
+| query.submitted | Ingestion | ingestion.completed | sources → Postgres |
+| ingestion.completed | Embedding | embedding.completed | vectors → Qdrant |
+| embedding.completed | Knowledge | knowledge.mined | entities → Postgres |
+| research.task.dispatched | Research | research.task.completed | notes → Postgres |
+| all research done | Synthesis | synthesis.completed | report → Postgres |
+
+## Resilience
+
+- SQS `maxReceiveCount: 3` → `eventforge-dlq`
+- Idempotency: `processed_events(event_id PK, worker_name, processed_at)`
+- Terminal failure: emit `pipeline.failed`, update JobStage → `failed`, push to SSE
+- LLM calls: 3 retries, exponential backoff
+
+## Queues (LocalStack + prod)
+
+`eventforge-ingestion`, `eventforge-embedding`, `eventforge-knowledge-mining`, `eventforge-research`, `eventforge-synthesis`, `eventforge-dlq`

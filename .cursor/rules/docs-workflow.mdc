@@ -1,0 +1,43 @@
+---
+description: Documentation workflow — tasks, phases, Linear sync, when to update docs
+globs: docs/**,CLAUDE.md,AGENTS.md,README.md
+alwaysApply: false
+---
+
+# Docs & Workflow
+
+## Source of truth
+
+| Layer | Role |
+|-------|------|
+| **Linear** (`EventForge` project) | Active work — acceptance criteria, blockers, status |
+| `docs/TASKS.md` | Roadmap mirror — checkboxes + `KRE-xxx` links |
+| `docs/LINEAR.md` | Issue index, parallel tracks, MCP cheat sheet |
+| `.cursor/rules/*.mdc` | Agent conventions |
+| `docs/ARCHITECTURE.md` etc. | Deep design reference |
+
+## Session start (Linear MCP)
+
+1. `list_issues` with project `EventForge` (or `get_issue` if user names `KRE-xxx`)
+2. Pick unblocked issue in current milestone
+3. Read acceptance criteria from issue + relevant `.cursor/rules/`
+
+## On issue complete
+
+1. Mark Done in Linear (`save_issue`, state: Done)
+2. Check matching boxes in `docs/TASKS.md`
+3. Update ADRs only if architecture changed
+
+## Doc roles
+
+| File | When to read |
+|------|--------------|
+| `docs/LINEAR.md` | Issue index, dependencies, what's next |
+| `docs/TASKS.md` | Phase progress, exit criteria |
+| `docs/ARCHITECTURE.md` | Pipeline, events, diagrams |
+| `docs/TECH_DECISIONS.md` | Before changing stack |
+| `docs/PRD.md` | Product scope |
+
+## Phase exit criteria
+
+Don't start Phase 2 until KRE-128 (Phase 1 smoke test) is Done.

@@ -1,0 +1,51 @@
+---
+description: Next.js frontend conventions — pages, React Flow, real-time UI
+globs: frontend/**
+alwaysApply: false
+---
+
+# Frontend (Next.js 15)
+
+## Structure
+
+```
+frontend/src/
+├── app/                    # App Router pages
+│   ├── page.tsx            # Home
+│   ├── queries/new/        # Submit query
+│   └── queries/[id]/       # Job detail + React Flow
+├── components/
+│   ├── ui/                 # shadcn/ui
+│   ├── workflow/           # React Flow pipeline nodes/edges
+│   └── dashboard/          # Synthesis viewer, sources, cost
+├── hooks/useJobStream.ts   # SSE subscription
+├── lib/api-client.ts       # Typed fetch (openapi-typescript)
+└── types/                  # Generated from OpenAPI
+```
+
+## Patterns
+
+- App Router, Server Components by default; `"use client"` only when needed (React Flow, SSE, forms)
+- shadcn/ui for all UI primitives — don't reinvent buttons, dialogs, etc.
+- API types generated from backend OpenAPI — don't hand-write request/response types
+- Env: `NEXT_PUBLIC_API_URL` for API base
+
+## React Flow pipeline
+
+Node states: `pending` → `running` → `completed` | `failed`
+
+Update nodes from SSE events keyed by `correlation_id`. Show per-stage duration and agent name on click.
+
+## Key pages
+
+- `/` — landing + recent queries
+- `/queries/new` — form: topic (required), depth, max_sources
+- `/queries/[id]` — React Flow + synthesis markdown + sources + cost panel
+
+## Real-time
+
+Prefer SSE over WebSocket (ADR-010). `useJobStream(jobId)` hook connects to `/api/v1/queries/{id}/stream`.
+
+## Auth (Phase 4)
+
+Clerk for sign-in. Pass JWT to API client. Protected routes via Clerk middleware.

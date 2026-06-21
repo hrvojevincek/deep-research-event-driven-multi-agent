@@ -1,0 +1,59 @@
+---
+description: FastAPI backend conventions — API, DB, workers, agents
+globs: backend/**
+alwaysApply: false
+---
+
+# Backend (FastAPI)
+
+Package: `backend/src/eventforge/`
+
+## Structure
+
+```
+eventforge/
+├── main.py           # FastAPI app entry
+├── api/routes/       # HTTP endpoints
+├── api/deps.py       # Auth, DB session deps
+├── agents/           # ingestion, embedding, knowledge, research, synthesis
+├── workers/          # SQS long-poll consumers (one module per stage)
+├── events/           # publisher + Pydantic event schemas
+├── db/models/        # SQLAlchemy 2.0 models
+├── db/repositories/  # data access
+├── core/config.py    # pydantic-settings from .env
+├── core/otel.py      # OTEL spans
+└── services/         # business logic
+```
+
+## Patterns
+
+- Async everywhere (`async def`, `asyncpg`, `httpx`)
+- Pydantic v2 for request/response + event payloads
+- Config via `pydantic-settings` — never hardcode secrets
+- Structured JSON logs in prod; include `correlation_id`, `job_id`, `agent_name`
+- OTEL span per agent step: `agent.{name}.{action}`
+
+## API conventions
+
+- Prefix: `/api/v1`
+- Health: `GET /health`, `GET /health/ready` (checks DB, Qdrant, EB)
+- SSE: `GET /api/v1/queries/{id}/stream` for pipeline updates
+
+## Worker pattern
+
+```python
+# 1. Receive SQS message
+# 2. Check processed_events(event_id) — skip if exists
+# 3. Process with OTEL span
+# 4. Persist results (Postgres / Qdrant)
+# 5. Publish next event to EventBridge
+# 6. Delete message; on failure leave for retry → DLQ
+```
+
+## DB models (MVP)
+
+`User`, `Job`, `JobStage`, `ProcessedEvent`, `LLMUsage`, `Source`
+
+## Tooling
+
+- Package manager: `uv` | Migrations: Alembic | Tests: pytest | Lint: ruff
