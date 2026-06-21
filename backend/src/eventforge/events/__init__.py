@@ -1,3 +1,9 @@
+from eventforge.events.publisher import (
+    EVENT_SOURCE,
+    PUBLISHER_WORKER_NAME,
+    EventPublisher,
+    EventPublishError,
+)
 from eventforge.events.schemas import (
     DETAIL_TYPE_QUERY_SUBMITTED,
     QUERY_SUBMITTED_SCHEMA_VERSION,
@@ -10,6 +16,10 @@ from eventforge.events.schemas import (
 
 __all__ = [
     "DETAIL_TYPE_QUERY_SUBMITTED",
+    "EVENT_SOURCE",
+    "PUBLISHER_WORKER_NAME",
+    "EventPublishError",
+    "EventPublisher",
     "QUERY_SUBMITTED_SCHEMA_VERSION",
     "EventEnvelope",
     "QueryDepth",

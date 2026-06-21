@@ -7,6 +7,7 @@ requires-python = ">=3.12"
 dependencies = [
     "alembic>=1.14",
     "asyncpg>=0.30",
+    "boto3>=1.43.34",
     "fastapi>=0.115",
     "pydantic-settings>=2.0",
     "sqlalchemy[asyncio]>=2.0",
@@ -36,6 +37,9 @@ target-version = "py312"
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP"]
 
+[tool.ruff.lint.isort]
+known-first-party = ["eventforge"]
+
 [tool.ruff.lint.per-file-ignores]
 "alembic/**" = ["E501", "I001", "UP007", "UP035"]
 "**/alembic/**" = ["E501", "I001", "UP007", "UP035"]
@@ -44,3 +48,6 @@ select = ["E", "F", "I", "UP"]
 testpaths = ["tests"]
 pythonpath = ["src"]
 asyncio_mode = "auto"
+markers = [
+    "integration: requires LocalStack or other external services",
+]

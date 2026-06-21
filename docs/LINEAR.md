@@ -65,9 +65,9 @@ save_issue(id: "KRE-122", state: "Done")
 ```
 Done:   KRE-118 → KRE-120 → KRE-123 → KRE-125
 
-Next:   KRE-122 (mini-122: envelope + query.submitted)
-        → KRE-129 (POST /queries + publisher + idempotency)
-        → KRE-130 (SQS base + ingestion worker + ingestion.completed schema)
+Done:   KRE-118 → KRE-120 → KRE-123 → KRE-125 → KRE-122 → KRE-129
+
+Next:   KRE-130 (SQS base + ingestion worker + ingestion.completed schema)
 
 Parallel (optional): KRE-127 backend ruff job only
 

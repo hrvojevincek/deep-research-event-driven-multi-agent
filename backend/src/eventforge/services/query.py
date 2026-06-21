@@ -1,0 +1,70 @@
+import uuid
+from dataclasses import dataclass
+
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from eventforge.db.models import Job, JobStage, JobStageName, JobStatus, StageStatus
+from eventforge.db.repositories import ProcessedEventRepository, UserRepository
+from eventforge.events.publisher import PUBLISHER_WORKER_NAME, EventPublisher
+from eventforge.events.schemas import QueryDepth, build_query_submitted_event
+
+
+@dataclass(frozen=True)
+class SubmitQueryResult:
+    job_id: uuid.UUID
+    correlation_id: str
+
+
+async def submit_query(
+    session: AsyncSession,
+    publisher: EventPublisher,
+    *,
+    topic: str,
+    depth: QueryDepth = QueryDepth.STANDARD,
+    max_sources: int | None = None,
+) -> SubmitQueryResult:
+    user = await UserRepository(session).get_or_create_mock_user()
+
+    job_id = uuid.uuid4()
+    correlation_id = uuid.uuid4().hex
+
+    job = Job(
+        id=job_id,
+        user_id=user.id,
+        correlation_id=correlation_id,
+        topic=topic,
+        depth=depth.value,
+        status=JobStatus.PENDING.value,
+        max_sources=max_sources,
+    )
+    session.add(job)
+
+    for stage_name in JobStageName:
+        session.add(
+            JobStage(
+                job_id=job_id,
+                stage=stage_name.value,
+                status=StageStatus.PENDING.value,
+            )
+        )
+
+    await session.flush()
+
+    event = build_query_submitted_event(
+        job_id=job_id,
+        correlation_id=correlation_id,
+        topic=topic,
+        depth=depth,
+        max_sources=max_sources,
+    )
+
+    processed_repo = ProcessedEventRepository(session)
+    event_id = str(event.event_id)
+
+    if not await processed_repo.exists(event_id):
+        await publisher.publish_query_submitted(event)
+        await processed_repo.record(event_id, PUBLISHER_WORKER_NAME)
+
+    await session.commit()
+
+    return SubmitQueryResult(job_id=job_id, correlation_id=correlation_id)

@@ -16,3 +16,9 @@ class ProcessedEventRepository(BaseRepository):
             select(ProcessedEvent).where(ProcessedEvent.event_id == event_id)
         )
         return result.scalar_one_or_none()
+
+    async def record(self, event_id: str, worker_name: str) -> ProcessedEvent:
+        event = ProcessedEvent(event_id=event_id, worker_name=worker_name)
+        self.session.add(event)
+        await self.session.flush()
+        return event

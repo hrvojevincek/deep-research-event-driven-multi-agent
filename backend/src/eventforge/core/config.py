@@ -22,6 +22,12 @@ class Settings(BaseSettings):
 
     cors_origins: list[str] = Field(default=["http://localhost:3000"])
 
+    aws_region: str = "us-east-1"
+    aws_endpoint_url: str | None = "http://localhost:4566"
+    aws_access_key_id: str = "test"
+    aws_secret_access_key: str = "test"
+    event_bus_name: str = "eventforge-bus"
+
     @property
     def database_url(self) -> str:
         return (

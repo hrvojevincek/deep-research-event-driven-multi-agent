@@ -4,6 +4,8 @@ from pathlib import Path
 from uuid import UUID
 
 import pytest
+from pydantic import ValidationError
+
 from eventforge.events.schemas import (
     DETAIL_TYPE_QUERY_SUBMITTED,
     QUERY_SUBMITTED_SCHEMA_VERSION,
@@ -12,7 +14,6 @@ from eventforge.events.schemas import (
     QuerySubmittedPayload,
     build_query_submitted_event,
 )
-from pydantic import ValidationError
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 SHARED_EVENTS = REPO_ROOT / "shared" / "events"
@@ -25,8 +26,7 @@ def test_query_submitted_payload_requires_topic() -> None:
 
 def test_query_submitted_payload_rejects_unknown_fields() -> None:
     with pytest.raises(ValidationError):
-        QuerySubmittedPayload.model_validate(
-            {"topic": "AI agents", "extra": True})
+        QuerySubmittedPayload.model_validate({"topic": "AI agents", "extra": True})
 
 
 def test_build_query_submitted_event_sets_envelope_fields() -> None:
@@ -69,8 +69,7 @@ def test_round_trip_through_pydantic() -> None:
         topic="Round trip",
     )
 
-    restored = QuerySubmittedEvent.model_validate_json(
-        original.model_dump_json())
+    restored = QuerySubmittedEvent.model_validate_json(original.model_dump_json())
     assert restored == original
 
 

@@ -1,10 +1,10 @@
-
 import pytest
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+
 from eventforge.core.config import get_settings
 from eventforge.db.models import Job, JobStatus, ProcessedEvent, User
 from eventforge.db.repositories import JobRepository, ProcessedEventRepository, UserRepository
 from eventforge.db.session import reset_engine
-from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 settings = get_settings()
 

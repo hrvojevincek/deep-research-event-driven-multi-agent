@@ -1,4 +1,4 @@
-.PHONY: help dev down logs seed test lint hooks lint-backend
+.PHONY: help dev down logs seed test lint hooks lint-backend lint-backend-fix
 
 help: ## Show available commands
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'
@@ -27,4 +27,7 @@ hooks: ## Install pre-commit git hooks (ruff check on commit)
 	uv run --project backend pre-commit install
 
 lint-backend: ## Run backend ruff locally (no docker)
-	cd backend && uv run ruff check .
+	uv run --project backend ruff check --config backend/pyproject.toml backend/
+
+lint-backend-fix: ## Auto-fix backend ruff issues (matches pre-commit)
+	uv run --project backend ruff check --fix --config backend/pyproject.toml backend/
