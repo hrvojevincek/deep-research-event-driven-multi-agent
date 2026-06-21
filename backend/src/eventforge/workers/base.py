@@ -71,13 +71,23 @@ class SqsConsumer(ABC):
                 WaitTimeSeconds=self._wait_time_seconds,
                 MessageAttributeNames=["All"],
             )
-        except (BotoCoreError, ClientError) as exc:
+        except (BotoCoreError, ClientError):
+            # Transient SQS/network errors must not kill the consumer loop;
+            # the next poll retries. Returning [] keeps run_forever alive.
             logger.exception("SQS receive failed", extra={"queue": self._queue_name})
-            raise exc
+            return []
         return response.get("Messages", [])
 
     def _delete_message(self, receipt_handle: str) -> None:
-        self.client.delete_message(QueueUrl=self.queue_url, ReceiptHandle=receipt_handle)
+        try:
+            self.client.delete_message(QueueUrl=self.queue_url, ReceiptHandle=receipt_handle)
+        except (BotoCoreError, ClientError):
+            # Delete failure means the message redelivers; idempotency guards
+            # against double-processing. Log so the failure is visible.
+            logger.exception(
+                "SQS delete failed; message will redeliver",
+                extra={"queue": self._queue_name},
+            )
 
     @abstractmethod
     async def handle_message(self, message: dict[str, Any]) -> None:
