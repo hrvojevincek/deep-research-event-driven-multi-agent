@@ -94,7 +94,7 @@ When an issue closes → check the matching box below and ensure `KRE-xxx` link 
 
 - [x] `POST /api/v1/queries` + EventBridge publisher + idempotency — KRE-129
 - [x] SQS consumer base + ingestion stub worker (+ `ingestion.completed` schema) — KRE-130
-- [ ] Harden idempotency: atomic `try_claim`, worker base, optional API `Idempotency-Key` — KRE-131 (after KRE-130)
+- [x] Harden idempotency: atomic `try_claim` + composite PK `(event_id, worker_name)` — KRE-131 (optional `Idempotency-Key` deferred → KRE-132)
 
 ### 2.1 API & Data Layer
 

@@ -1,3 +1,4 @@
+import logging
 import uuid
 from dataclasses import dataclass
 
@@ -7,6 +8,8 @@ from eventforge.db.models import Job, JobStage, JobStageName, JobStatus, StageSt
 from eventforge.db.repositories import ProcessedEventRepository, UserRepository
 from eventforge.events.publisher import PUBLISHER_WORKER_NAME, EventPublisher
 from eventforge.events.schemas import QueryDepth, build_query_submitted_event
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True)
@@ -61,9 +64,13 @@ async def submit_query(
     processed_repo = ProcessedEventRepository(session)
     event_id = str(event.event_id)
 
-    if not await processed_repo.exists(event_id):
+    if await processed_repo.try_claim(event_id, PUBLISHER_WORKER_NAME):
         await publisher.publish_query_submitted(event)
-        await processed_repo.record(event_id, PUBLISHER_WORKER_NAME)
+    else:
+        logger.info(
+            "Skipped publish; query.submitted already claimed",
+            extra={"event_id": event_id, "job_id": str(job_id), "correlation_id": correlation_id},
+        )
 
     await session.commit()
 

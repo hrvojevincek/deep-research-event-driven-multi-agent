@@ -144,6 +144,52 @@ async def test_process_query_submitted_skips_duplicate_event(db_session: AsyncSe
     assert duplicate_result is None
     mock_publisher.publish.assert_not_awaited()
 
+    # Duplicate SQS delivery must not create a second batch of sources.
+    source_count = await db_session.scalar(
+        select(func.count()).select_from(Source).where(Source.job_id == job.id)
+    )
+    assert source_count == 2
+
+
+async def test_try_claim_is_atomic_for_repeated_attempts(db_session: AsyncSession) -> None:
+    repo = ProcessedEventRepository(db_session)
+    event_id = str(uuid.uuid4())
+
+    assert await repo.try_claim(event_id, WORKER_NAME_INGESTION) is True
+    # Second claim for the same (event_id, worker) loses.
+    assert await repo.try_claim(event_id, WORKER_NAME_INGESTION) is False
+
+
+async def test_try_claim_scopes_by_worker_name(db_session: AsyncSession) -> None:
+    """The API publisher and ingestion worker must claim the same event_id."""
+    repo = ProcessedEventRepository(db_session)
+    event_id = str(uuid.uuid4())
+
+    assert await repo.try_claim(event_id, "api") is True
+    assert await repo.try_claim(event_id, WORKER_NAME_INGESTION) is True
+
+
+async def test_process_succeeds_when_api_already_claimed_event(db_session: AsyncSession) -> None:
+    """Regression: API claiming the event must not block the ingestion worker."""
+    job, stage = await _seed_job(db_session)
+    mock_publisher = AsyncMock(spec=EventPublisher)
+    inbound = build_query_submitted_event(
+        job_id=job.id,
+        correlation_id=job.correlation_id,
+        topic=job.topic,
+    )
+
+    # Simulate the API publisher having claimed this event_id.
+    repo = ProcessedEventRepository(db_session)
+    assert await repo.try_claim(str(inbound.event_id), "api") is True
+
+    result = await process_query_submitted(db_session, mock_publisher, inbound)
+
+    assert result is not None
+    mock_publisher.publish.assert_awaited_once()
+    await db_session.refresh(stage)
+    assert stage.status == StageStatus.COMPLETED.value
+
 
 async def test_process_query_submitted_uses_default_source_count(db_session: AsyncSession) -> None:
     suffix = uuid.uuid4().hex[:8]

@@ -37,7 +37,9 @@ async def process_query_submitted(
     processed_repo = ProcessedEventRepository(session)
     event_id = str(event.event_id)
 
-    if await processed_repo.exists(event_id):
+    # Atomic claim: if another delivery already claimed this event for the
+    # ingestion worker, skip without re-processing (SQS at-least-once delivery).
+    if not await processed_repo.try_claim(event_id, WORKER_NAME_INGESTION):
         return None
 
     job_repo = JobRepository(session)
@@ -74,7 +76,6 @@ async def process_query_submitted(
         raise
 
     await stage_repo.mark_completed(ingestion_stage)
-    await processed_repo.record(event_id, WORKER_NAME_INGESTION)
     await session.commit()
 
     return completed_event

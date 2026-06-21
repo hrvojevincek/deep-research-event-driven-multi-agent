@@ -36,9 +36,12 @@ class StageStatus(StrEnum):
 class User(Base):
     __tablename__ = "users"
 
-    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    clerk_id: Mapped[str | None] = mapped_column(String(255), unique=True, nullable=True)
-    email: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    clerk_id: Mapped[str | None] = mapped_column(
+        String(255), unique=True, nullable=True)
+    email: Mapped[str] = mapped_column(
+        String(255), unique=True, nullable=False)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )
@@ -55,14 +58,17 @@ class User(Base):
 class Job(Base):
     __tablename__ = "jobs"
 
-    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    user_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
-    )
-    correlation_id: Mapped[str] = mapped_column(String(64), unique=True, nullable=False, index=True)
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey(
+        "users.id", ondelete="CASCADE"), nullable=False, index=True)
+    correlation_id: Mapped[str] = mapped_column(
+        String(64), unique=True, nullable=False, index=True)
     topic: Mapped[str] = mapped_column(Text, nullable=False)
-    depth: Mapped[str] = mapped_column(String(32), nullable=False, default="standard")
-    status: Mapped[str] = mapped_column(String(32), nullable=False, default=JobStatus.PENDING.value)
+    depth: Mapped[str] = mapped_column(
+        String(32), nullable=False, default="standard")
+    status: Mapped[str] = mapped_column(
+        String(32), nullable=False, default=JobStatus.PENDING.value)
     max_sources: Mapped[int | None] = mapped_column(Integer, nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
@@ -85,18 +91,23 @@ class Job(Base):
 
 class JobStage(Base):
     __tablename__ = "job_stages"
-    __table_args__ = (UniqueConstraint("job_id", "stage", name="uq_job_stages_job_id_stage"),)
+    __table_args__ = (
+        UniqueConstraint(
+            "job_id", "stage",
+            name="uq_job_stages_job_id_stage"),)
 
-    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    job_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("jobs.id", ondelete="CASCADE"), nullable=False, index=True
-    )
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    job_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey(
+        "jobs.id", ondelete="CASCADE"), nullable=False, index=True)
     stage: Mapped[str] = mapped_column(String(64), nullable=False)
     status: Mapped[str] = mapped_column(
         String(32), nullable=False, default=StageStatus.PENDING.value
     )
-    started_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
-    completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    started_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True)
+    completed_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True)
     error_detail: Mapped[str | None] = mapped_column(Text, nullable=True)
     duration_ms: Mapped[int | None] = mapped_column(Integer, nullable=True)
     created_at: Mapped[datetime] = mapped_column(
@@ -115,10 +126,10 @@ class JobStage(Base):
 class Source(Base):
     __tablename__ = "sources"
 
-    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    job_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("jobs.id", ondelete="CASCADE"), nullable=False, index=True
-    )
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    job_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey(
+        "jobs.id", ondelete="CASCADE"), nullable=False, index=True)
     url: Mapped[str] = mapped_column(String(2048), nullable=False)
     title: Mapped[str] = mapped_column(String(512), nullable=False)
     snippet: Mapped[str] = mapped_column(Text, nullable=False)
@@ -132,8 +143,11 @@ class Source(Base):
 class ProcessedEvent(Base):
     __tablename__ = "processed_events"
 
+    # Composite PK lets each consumer claim the same event_id independently
+    # (e.g. the API publisher and the ingestion worker both reference one
+    # query.submitted event_id without colliding).
     event_id: Mapped[str] = mapped_column(String(128), primary_key=True)
-    worker_name: Mapped[str] = mapped_column(String(64), nullable=False)
+    worker_name: Mapped[str] = mapped_column(String(64), primary_key=True)
     processed_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )
