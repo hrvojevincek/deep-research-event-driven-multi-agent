@@ -6,21 +6,40 @@ Canonical event contracts shared between backend publishers, workers, and Step F
 
 ## Conventions
 
-- Event names: `eventforge.<domain>.<action>` (e.g. `eventforge.research.query_submitted`)
-- All events include: `event_id`, `correlation_id`, `timestamp`, `schema_version`, `payload`
-- Schemas defined as JSON Schema in this directory; mirrored as Pydantic models in `backend/src/eventforge/events/schemas/`
+- EventBridge `detail-type`: `eventforge.<domain>.<action>` (e.g. `eventforge.query.submitted`)
+- Envelope fields: `event_id`, `correlation_id`, `job_id`, `timestamp`, `schema_version`, `detail_type`, `payload`
+- JSON Schema in this directory; mirrored as Pydantic in `backend/src/eventforge/events/schemas/`
 
-## Planned Events (MVP)
+## Incremental schema policy (mini-122)
 
-| Event | Producer | Consumer(s) |
-|-------|----------|-------------|
-| `query.submitted` | API | Ingestion worker |
-| `ingestion.completed` | Ingestion agent | Embedding worker |
-| `embedding.completed` | Embedding agent | Knowledge mining worker |
-| `knowledge.mined` | Knowledge agent | Research orchestrator |
-| `research.task.dispatched` | Orchestrator | Research workers (parallel) |
-| `research.task.completed` | Research worker | Synthesis agent |
-| `synthesis.completed` | Synthesis agent | API / WebSocket notifier |
-| `pipeline.failed` | Any stage | DLQ + alerting |
+Define schemas **when the producer is implemented**, not all upfront:
 
-Schema files will be added in Phase 2.
+| When | Schema |
+|------|--------|
+| KRE-122 | Shared envelope + `query.submitted` |
+| KRE-130 | `ingestion.completed` |
+| Each later worker | That stage's output event (+ `pipeline.failed` with orchestration) |
+
+## Schema index
+
+| File | Status | Producer | Consumer |
+|------|--------|----------|----------|
+| `envelope.schema.json` | Done (KRE-122) | All | All |
+| `query.submitted.schema.json` | Done (KRE-122) | API | Ingestion worker |
+| `ingestion.completed.schema.json` | Planned (KRE-130) | Ingestion | Embedding worker |
+| `embedding.completed.schema.json` | Phase 2 | Embedding | Knowledge worker |
+| `knowledge.mined.schema.json` | Phase 2 | Knowledge | Research orchestrator |
+| `research.task.dispatched.schema.json` | Phase 2 | Orchestrator | Research workers |
+| `research.task.completed.schema.json` | Phase 2 | Research | Synthesis |
+| `synthesis.completed.schema.json` | Phase 2 | Synthesis | API / SSE |
+| `pipeline.failed.schema.json` | Phase 2 | Any stage | DLQ + alerting |
+
+## Planned pipeline (reference)
+
+```
+query.submitted → ingestion.completed → embedding.completed → knowledge.mined
+  → research.task.dispatched (×N) → research.task.completed (×N)
+  → synthesis.completed
+```
+
+See `docs/ARCHITECTURE.md` §3 for sequence diagram.

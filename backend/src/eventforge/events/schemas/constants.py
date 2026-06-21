@@ -1,0 +1,2 @@
+DETAIL_TYPE_QUERY_SUBMITTED = "eventforge.query.submitted"
+QUERY_SUBMITTED_SCHEMA_VERSION = "1.0"

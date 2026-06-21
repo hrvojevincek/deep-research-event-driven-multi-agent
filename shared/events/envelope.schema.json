@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://eventforge.dev/schemas/envelope.schema.json",
+  "title": "EventForge Event Envelope",
+  "description": "Shared wrapper for every EventBridge event in the pipeline.",
+  "type": "object",
+  "required": [
+    "event_id",
+    "correlation_id",
+    "job_id",
+    "timestamp",
+    "schema_version",
+    "detail_type",
+    "payload"
+  ],
+  "properties": {
+    "event_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Unique ID for this event instance; used for idempotency in processed_events."
+    },
+    "correlation_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64,
+      "description": "Threads one user query through API, workers, OTEL traces, and SSE."
+    },
+    "job_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Primary key of the jobs row in Postgres."
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the event was produced (ISO 8601, UTC recommended)."
+    },
+    "schema_version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+$",
+      "description": "Semantic version of this event's payload contract, e.g. 1.0."
+    },
+    "detail_type": {
+      "type": "string",
+      "pattern": "^eventforge\\.",
+      "description": "EventBridge detail-type, e.g. eventforge.query.submitted."
+    },
+    "payload": {
+      "type": "object",
+      "description": "Stage-specific body; validated by a separate payload schema."
+    }
+  },
+  "additionalProperties": false
+}

@@ -73,10 +73,12 @@ When an issue closes → check the matching box below and ensure `KRE-xxx` link 
 
 - [ ] OpenAPI spec generation from FastAPI — KRE-126
 - [ ] `openapi-typescript` codegen in frontend — KRE-126
-- [ ] Initial event JSON schemas in `shared/events/` — KRE-122
+- [x] Event envelope + `query.submitted` JSON schemas (mini-122) — KRE-122
 - [ ] CI lint workflow (ruff + eslint) — KRE-127
 
 **Phase 1 exit criteria:** `make dev` runs full stack; health endpoints return 200; frontend renders placeholder UI. → [KRE-128](https://linear.app/kreativbiro/issue/KRE-128)
+
+> **Backend-first:** Phase 2 vertical slices (KRE-129, KRE-130) may start after mini-122 without waiting for Phase 1 frontend or KRE-128.
 
 ---
 
@@ -84,29 +86,33 @@ When an issue closes → check the matching box below and ensure `KRE-xxx` link 
 
 **Goal:** End-to-end query submission → event publishing → worker processing (mocked LLM) → DB persistence.
 
+**Strategy:** Vertical slices + incremental event schemas (see `docs/LINEAR.md` backend-first track).
+
+### 2.0 Vertical slices (Linear)
+
+→ [KRE-129](https://linear.app/kreativbiro/issue/KRE-129) · [KRE-130](https://linear.app/kreativbiro/issue/KRE-130)
+
+- [ ] `POST /api/v1/queries` + EventBridge publisher + idempotency — KRE-129
+- [ ] SQS consumer base + ingestion stub worker (+ `ingestion.completed` schema) — KRE-130
+
 ### 2.1 API & Data Layer
 
-- [ ] `POST /api/v1/queries` — create job, emit `query.submitted`
 - [ ] `GET /api/v1/queries/{id}` — job detail with stages
 - [ ] `GET /api/v1/queries` — list user queries (mock user for now)
-- [ ] Event publisher module (EventBridge via boto3 / LocalStack)
-- [ ] Idempotency table + check logic
 
 ### 2.2 Workers (Stub Agents)
 
-- [ ] SQS consumer base class (long-poll, retry, DLQ)
-- [ ] Ingestion worker (mock: generate fake sources)
-- [ ] Embedding worker (mock: store fake chunks in Postgres via pgvector)
-- [ ] Knowledge mining worker (mock: extract fake entities)
-- [ ] Research worker (mock: generate fake research notes)
-- [ ] Synthesis worker (mock: combine into markdown report)
+- [ ] Embedding worker (mock: store fake chunks in Postgres via pgvector) + `embedding.completed` schema
+- [ ] Knowledge mining worker (mock: extract fake entities) + `knowledge.mined` schema
+- [ ] Research worker (mock: generate fake research notes) + `research.task.*` schemas
+- [ ] Synthesis worker (mock: combine into markdown report) + `synthesis.completed` schema
 - [ ] Wire EventBridge rules → SQS queues (LocalStack)
 
 ### 2.3 Orchestration
 
 - [ ] Sequential event chaining (ingestion → embedding → knowledge → research → synthesis)
 - [ ] Research fan-out: dispatch N tasks (simplified local — skip Step Functions initially)
-- [ ] DLQ handling + `pipeline.failed` event
+- [ ] DLQ handling + `pipeline.failed` event + schema
 - [ ] Update `JobStage` status in Postgres at each step
 
 **Phase 2 exit criteria:** Submit query via API → all stages complete → result in DB (mocked LLM).
@@ -271,6 +277,8 @@ Project: EventForge
 
 ## Current Priority
 
-**Next up:** Complete Phase 0 verification, then **Phase 1 — Application Scaffolding**.
+**Backend-first track:** [KRE-122](https://linear.app/kreativbiro/issue/KRE-122) (mini-122) → [KRE-129](https://linear.app/kreativbiro/issue/KRE-129) → [KRE-130](https://linear.app/kreativbiro/issue/KRE-130).
 
-Say: _"Implement Phase 1"_ to begin backend and frontend initialization.
+Frontend + Phase 1 exit ([KRE-128](https://linear.app/kreativbiro/issue/KRE-128)) deferred until pipeline slices work via API/curl.
+
+Say: _"Implement KRE-122"_ to start mini-122 schemas.

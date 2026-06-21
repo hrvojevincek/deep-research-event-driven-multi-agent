@@ -22,8 +22,8 @@
 
 ```
 list_issues(project: "EventForge")
-get_issue(id: "KRE-117")
-save_issue(id: "KRE-117", state: "Done")
+get_issue(id: "KRE-122")
+save_issue(id: "KRE-122", state: "Done")
 ```
 
 ## Milestones
@@ -31,7 +31,8 @@ save_issue(id: "KRE-117", state: "Done")
 | Milestone | Status |
 |-----------|--------|
 | Phase 0 — Foundation | Complete |
-| Phase 1 — Scaffolding | Backlog |
+| Phase 1 — Scaffolding | In progress (backend done; frontend deferred) |
+| Phase 2 — Core Pipeline | Active (backend-first vertical slices) |
 
 ## Issue index (Phase 0 + 1)
 
@@ -46,13 +47,34 @@ save_issue(id: "KRE-117", state: "Done")
 | EF-007 | [KRE-121](https://linear.app/kreativbiro/issue/KRE-121) | Frontend layout + placeholder pages | 3 | KRE-119 |
 | EF-008 | [KRE-124](https://linear.app/kreativbiro/issue/KRE-124) | Frontend API client + Dockerfile + compose | 2 | KRE-121 |
 | EF-009 | [KRE-126](https://linear.app/kreativbiro/issue/KRE-126) | OpenAPI generation + TypeScript codegen | 2 | KRE-120, KRE-124 |
-| EF-010 | [KRE-122](https://linear.app/kreativbiro/issue/KRE-122) | Initial event JSON schemas | 2 | KRE-118 |
-| EF-011 | [KRE-127](https://linear.app/kreativbiro/issue/KRE-127) | CI stub — lint workflow | 1 | KRE-125, KRE-124 |
+| EF-010 | [KRE-122](https://linear.app/kreativbiro/issue/KRE-122) | Event envelope + query.submitted schemas (mini-122) | 1 | KRE-118 |
+| EF-011 | [KRE-127](https://linear.app/kreativbiro/issue/KRE-127) | CI stub — lint workflow | 1 | KRE-125 (backend); KRE-124 (eslint) |
 | EF-012 | [KRE-128](https://linear.app/kreativbiro/issue/KRE-128) | Phase 1 integration smoke test | 2 | KRE-125, KRE-124, KRE-126, KRE-122, KRE-127 |
 
-**Total estimate:** 27 points
+## Issue index (Phase 2 — vertical slices)
 
-## Parallel tracks (after KRE-117)
+| ID | Linear | Title | Estimate | Blocked by |
+|----|--------|-------|----------|------------|
+| EF-013 | [KRE-129](https://linear.app/kreativbiro/issue/KRE-129) | Query API + EventBridge publisher + idempotency | 3 | KRE-122 |
+| EF-014 | [KRE-130](https://linear.app/kreativbiro/issue/KRE-130) | SQS consumer base + ingestion stub worker | 3 | KRE-129 |
+
+> Remaining Phase 2 work (embedding → synthesis workers, orchestration, DLQ) stays in `docs/TASKS.md` until split into Linear issues. **Stage event schemas are added incrementally with each worker** — not upfront in KRE-122.
+
+## Backend-first track (recommended)
+
+```
+Done:   KRE-118 → KRE-120 → KRE-123 → KRE-125
+
+Next:   KRE-122 (mini-122: envelope + query.submitted)
+        → KRE-129 (POST /queries + publisher + idempotency)
+        → KRE-130 (SQS base + ingestion worker + ingestion.completed schema)
+
+Parallel (optional): KRE-127 backend ruff job only
+
+Defer:  KRE-119 → KRE-121 → KRE-124 → KRE-126 → KRE-128 (Phase 1 full-stack exit)
+```
+
+## Parallel tracks (original Phase 1)
 
 ```
 Track A (backend): KRE-118 → KRE-120 → KRE-123 → KRE-125 → KRE-127
@@ -63,14 +85,15 @@ Finish: KRE-128
 
 ## Labels
 
-`phase-0`, `phase-1`, `backend`, `frontend`, `infra`, `docs`, `workflows`, `agents`, `observability`, `Feature`
+`phase-0`, `phase-1`, `phase-2`, `backend`, `frontend`, `infra`, `docs`, `workflows`, `agents`, `observability`, `Feature`
 
 ## User shortcuts
 
 | Say this | Agent does |
 |----------|------------|
 | "What's next in EventForge?" | `list_issues` → suggest unblocked work |
-| "Implement KRE-118" | `get_issue` → implement acceptance criteria |
+| "Implement KRE-122" | Mini-122 schemas + Pydantic mirror |
+| "Implement KRE-129" | Query API + EventBridge publisher |
 | "Mark KRE-117 done" | Close in Linear + update TASKS.md |
 
 ## Grill-me decisions (2025-06-20)
@@ -80,3 +103,10 @@ Finish: KRE-128
 - New EventForge project on Kreativbiro
 - Backend: `uv`
 - Phase 1 includes lint-only CI stub
+
+## Plan revision (2026-06-21)
+
+- **Mini-122:** KRE-122 scoped to envelope + `query.submitted` only (1 pt)
+- **Backend-first:** Phase 2 vertical slices (KRE-129, KRE-130) may start before Phase 1 frontend exit
+- **Incremental schemas:** remaining pipeline events defined when each worker is built
+- Phase 1 exit (KRE-128) still requires frontend — do not block pipeline work on it
