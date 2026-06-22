@@ -65,5 +65,55 @@ awslocal events put-targets \
   --targets "Id=knowledge-queue,Arn=${KNOWLEDGE_QUEUE_ARN}" \
   || true
 
+RESEARCH_QUEUE_URL="$(awslocal sqs get-queue-url --queue-name eventforge-research --query 'QueueUrl' --output text)"
+RESEARCH_QUEUE_ARN="$(awslocal sqs get-queue-attributes \
+  --queue-url "${RESEARCH_QUEUE_URL}" \
+  --attribute-names QueueArn \
+  --query 'Attributes.QueueArn' \
+  --output text)"
+
+awslocal events put-rule \
+  --name eventforge-knowledge-mined-to-research \
+  --event-bus-name eventforge-bus \
+  --event-pattern '{"detail-type":["eventforge.knowledge.mined"]}' \
+  || true
+
+awslocal events put-targets \
+  --rule eventforge-knowledge-mined-to-research \
+  --event-bus-name eventforge-bus \
+  --targets "Id=research-queue,Arn=${RESEARCH_QUEUE_ARN}" \
+  || true
+
+awslocal events put-rule \
+  --name eventforge-research-task-dispatched-to-research \
+  --event-bus-name eventforge-bus \
+  --event-pattern '{"detail-type":["eventforge.research.task.dispatched"]}' \
+  || true
+
+awslocal events put-targets \
+  --rule eventforge-research-task-dispatched-to-research \
+  --event-bus-name eventforge-bus \
+  --targets "Id=research-dispatch-queue,Arn=${RESEARCH_QUEUE_ARN}" \
+  || true
+
+SYNTHESIS_QUEUE_URL="$(awslocal sqs get-queue-url --queue-name eventforge-synthesis --query 'QueueUrl' --output text)"
+SYNTHESIS_QUEUE_ARN="$(awslocal sqs get-queue-attributes \
+  --queue-url "${SYNTHESIS_QUEUE_URL}" \
+  --attribute-names QueueArn \
+  --query 'Attributes.QueueArn' \
+  --output text)"
+
+awslocal events put-rule \
+  --name eventforge-research-task-completed-to-synthesis \
+  --event-bus-name eventforge-bus \
+  --event-pattern '{"detail-type":["eventforge.research.task.completed"]}' \
+  || true
+
+awslocal events put-targets \
+  --rule eventforge-research-task-completed-to-synthesis \
+  --event-bus-name eventforge-bus \
+  --targets "Id=synthesis-queue,Arn=${SYNTHESIS_QUEUE_ARN}" \
+  || true
+
 # Wire DLQ redrive policy (configure in Phase 2)
 echo "EventForge LocalStack resources initialized."

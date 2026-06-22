@@ -20,6 +20,7 @@ Define schemas **when the producer is implemented**, not all upfront:
 | KRE-130           | `ingestion.completed`                                              |
 | Phase 2.2         | `embedding.completed`                                              |
 | Phase 2.2         | `knowledge.mined`                                                  |
+| Phase 2.2         | `research.task.dispatched`, `research.task.completed`              |
 | Each later worker | That stage's output event (+ `pipeline.failed` with orchestration) |
 
 ## Schema index
@@ -31,8 +32,8 @@ Define schemas **when the producer is implemented**, not all upfront:
 | `ingestion.completed.schema.json`      | Done (KRE-130)   | Ingestion    | Embedding worker      |
 | `embedding.completed.schema.json`      | Done (Phase 2.2) | Embedding    | Knowledge worker      |
 | `knowledge.mined.schema.json`          | Done (Phase 2.2) | Knowledge    | Research orchestrator |
-| `research.task.dispatched.schema.json` | Phase 2          | Orchestrator | Research workers      |
-| `research.task.completed.schema.json`  | Phase 2          | Research     | Synthesis             |
+| `research.task.dispatched.schema.json` | Done (Phase 2.2) | Research     | Research workers      |
+| `research.task.completed.schema.json`  | Done (Phase 2.2) | Research     | Synthesis             |
 | `synthesis.completed.schema.json`      | Phase 2          | Synthesis    | API / SSE             |
 | `pipeline.failed.schema.json`          | Phase 2          | Any stage    | DLQ + alerting        |
 

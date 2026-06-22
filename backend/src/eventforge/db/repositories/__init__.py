@@ -2,6 +2,7 @@ from eventforge.db.repositories.base import BaseRepository
 from eventforge.db.repositories.job import JobRepository, JobStageRepository
 from eventforge.db.repositories.knowledge_entity import KnowledgeEntityRepository
 from eventforge.db.repositories.processed_event import ProcessedEventRepository
+from eventforge.db.repositories.research_note import ResearchNoteRepository
 from eventforge.db.repositories.source import SourceRepository
 from eventforge.db.repositories.user import UserRepository
 
@@ -11,6 +12,7 @@ __all__ = [
     "JobStageRepository",
     "KnowledgeEntityRepository",
     "ProcessedEventRepository",
+    "ResearchNoteRepository",
     "SourceRepository",
     "UserRepository",
 ]

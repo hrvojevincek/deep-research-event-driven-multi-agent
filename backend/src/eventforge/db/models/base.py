@@ -96,6 +96,9 @@ class Job(Base):
     knowledge_entities: Mapped[list["KnowledgeEntity"]] = relationship(
         back_populates="job", cascade="all, delete-orphan"
     )
+    research_notes: Mapped[list["ResearchNote"]] = relationship(
+        back_populates="job", cascade="all, delete-orphan"
+    )
 
 
 class JobStage(Base):
@@ -210,6 +213,30 @@ class KnowledgeEntity(Base):
 
     job: Mapped["Job"] = relationship(back_populates="knowledge_entities")
     chunk: Mapped["DocumentChunk | None"] = relationship(back_populates="knowledge_entities")
+
+
+class ResearchNote(Base):
+    __tablename__ = "research_notes"
+    __table_args__ = (
+        UniqueConstraint("job_id", "task_index", name="uq_research_notes_job_id_task_index"),
+        UniqueConstraint("task_id", name="uq_research_notes_task_id"),
+    )
+
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+    )
+    job_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("jobs.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    task_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), nullable=False)
+    task_index: Mapped[int] = mapped_column(Integer, nullable=False)
+    sub_query: Mapped[str] = mapped_column(Text, nullable=False)
+    content: Mapped[str] = mapped_column(Text, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False
+    )
+
+    job: Mapped["Job"] = relationship(back_populates="research_notes")
 
 
 class ProcessedEvent(Base):
