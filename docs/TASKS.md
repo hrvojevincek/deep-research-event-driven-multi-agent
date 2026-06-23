@@ -106,7 +106,7 @@ When an issue closes → check the matching box below and ensure `KRE-xxx` link 
 - [x] Embedding worker (mock: store fake chunks in Postgres via pgvector) + `embedding.completed` schema
 - [x] Knowledge mining worker (mock: extract fake entities) + `knowledge.mined` schema
 - [x] Research worker (mock: generate fake research notes) + `research.task.*` schemas
-- [ ] Synthesis worker (mock: combine into markdown report) + `synthesis.completed` schema
+- [x] Synthesis worker (mock: combine into markdown report) + `synthesis.completed` schema
 - [ ] Wire EventBridge rules → SQS queues (LocalStack)
 
 ### 2.3 Orchestration
@@ -279,6 +279,6 @@ Project: EventForge
 
 ## Current Priority
 
-**Backend-first track:** Synthesis worker (Phase 2.2) or [KRE-132](https://linear.app/kreativbiro/issue/KRE-132) review cleanup.
+**Backend-first track:** Phase 2 end-to-end smoke test, then Phase 2.3 (DLQ + `pipeline.failed`) or [KRE-132](https://linear.app/kreativbiro/issue/KRE-132) review cleanup.
 
 Frontend + Phase 1 exit ([KRE-128](https://linear.app/kreativbiro/issue/KRE-128)) deferred until pipeline slices work via API/curl.

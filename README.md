@@ -16,22 +16,22 @@ make dev
 
 ### Cursor IDE (agent context)
 
-| Source | Purpose |
-|--------|---------|
+| Source                               | Purpose                                       |
+| ------------------------------------ | --------------------------------------------- |
 | [`.cursor/rules/`](./.cursor/rules/) | **Auto-loaded rules** — primary agent context |
-| [AGENTS.md](./AGENTS.md) | Cursor agent entry point |
-| [CLAUDE.md](./CLAUDE.md) | Concise agent summary |
+| [AGENTS.md](./AGENTS.md)             | Cursor agent entry point                      |
+| [CLAUDE.md](./CLAUDE.md)             | Concise agent summary                         |
 
 ### Deep reference
 
-| Document | Purpose |
-|----------|---------|
-| [docs/PRD.md](./docs/PRD.md) | Product requirements & user stories |
-| [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md) | System design, event flows, diagrams |
-| [docs/TECH_DECISIONS.md](./docs/TECH_DECISIONS.md) | Architecture Decision Records (ADRs) |
-| [docs/LINEAR.md](./docs/LINEAR.md) | Linear issue index + MCP workflow |
-| [docs/TASKS.md](./docs/TASKS.md) | Prioritized roadmap (mirror) |
-| [docs/LOCAL_DEV.md](./docs/LOCAL_DEV.md) | Local development with Docker Compose |
+| Document                                           | Purpose                               |
+| -------------------------------------------------- | ------------------------------------- |
+| [docs/PRD.md](./docs/PRD.md)                       | Product requirements & user stories   |
+| [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md)     | System design, event flows, diagrams  |
+| [docs/TECH_DECISIONS.md](./docs/TECH_DECISIONS.md) | Architecture Decision Records (ADRs)  |
+| [docs/LINEAR.md](./docs/LINEAR.md)                 | Linear issue index + MCP workflow     |
+| [docs/TASKS.md](./docs/TASKS.md)                   | Prioritized roadmap (mirror)          |
+| [docs/LOCAL_DEV.md](./docs/LOCAL_DEV.md)           | Local development with Docker Compose |
 
 ## Stack
 
@@ -48,7 +48,7 @@ make dev
 event-driven/
 ├── frontend/          # Next.js app
 ├── backend/           # FastAPI + agents + workers
-├── infra/             # Terraform / IaC
+├── infra/             # Terraform / IaC∏
 ├── shared/            # Event schemas, API contracts
 ├── docs/              # Project documentation
 └── scripts/           # Dev & ops helpers
