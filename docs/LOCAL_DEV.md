@@ -243,6 +243,8 @@ Run a single worker manually:
 uv run --project backend python -m eventforge.workers.ingestion
 ```
 
+**Tavily (Phase 3 ingestion):** set `TAVILY_API_KEY` in `.env` before running the ingestion worker or E2E smoke test. Without it, ingestion fails with a clear config error.
+
 ### Hybrid dev loop (API + workers)
 
 ```bash

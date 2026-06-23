@@ -8,7 +8,6 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 from eventforge.agents.ingestion import (
-    DEFAULT_MOCK_SOURCE_COUNT,
     parse_query_submitted_event,
     process_query_submitted,
 )
@@ -20,12 +19,32 @@ from eventforge.events.parser import parse_eventbridge_sqs_body
 from eventforge.events.publisher import EventPublisher
 from eventforge.events.schemas import (
     WORKER_NAME_INGESTION,
+    QueryDepth,
     build_ingestion_completed_event,
     build_query_submitted_event,
 )
+from eventforge.services.search import DEFAULT_SOURCE_COUNT_BY_DEPTH, TavilyClient
+from eventforge.services.search.types import WebSearchResult
 from eventforge.workers.ingestion import IngestionWorker
 
 settings = get_settings()
+
+
+def _mock_search_results(count: int) -> list[WebSearchResult]:
+    return [
+        WebSearchResult(
+            url=f"https://example.org/source/{index}",
+            title=f"Source {index}",
+            snippet=f"Content about the topic (source {index}).",
+        )
+        for index in range(1, count + 1)
+    ]
+
+
+def _mock_tavily_client(max_results: int) -> TavilyClient:
+    client = AsyncMock(spec=TavilyClient)
+    client.search = AsyncMock(return_value=_mock_search_results(max_results))
+    return client
 
 
 @pytest.fixture
@@ -104,7 +123,12 @@ async def test_process_query_submitted_writes_sources_and_updates_stage(
         topic=job.topic,
     )
 
-    result = await process_query_submitted(db_session, mock_publisher, inbound)
+    result = await process_query_submitted(
+        db_session,
+        mock_publisher,
+        inbound,
+        search_client=_mock_tavily_client(2),
+    )
 
     assert result is not None
     assert result.payload.source_count == 2
@@ -137,10 +161,20 @@ async def test_process_query_submitted_skips_duplicate_event(db_session: AsyncSe
         topic=job.topic,
     )
 
-    await process_query_submitted(db_session, mock_publisher, inbound)
+    await process_query_submitted(
+        db_session,
+        mock_publisher,
+        inbound,
+        search_client=_mock_tavily_client(2),
+    )
     mock_publisher.reset_mock()
 
-    duplicate_result = await process_query_submitted(db_session, mock_publisher, inbound)
+    duplicate_result = await process_query_submitted(
+        db_session,
+        mock_publisher,
+        inbound,
+        search_client=_mock_tavily_client(2),
+    )
     assert duplicate_result is None
     mock_publisher.publish.assert_not_awaited()
 
@@ -183,7 +217,12 @@ async def test_process_succeeds_when_api_already_claimed_event(db_session: Async
     repo = ProcessedEventRepository(db_session)
     assert await repo.try_claim(str(inbound.event_id), "api") is True
 
-    result = await process_query_submitted(db_session, mock_publisher, inbound)
+    result = await process_query_submitted(
+        db_session,
+        mock_publisher,
+        inbound,
+        search_client=_mock_tavily_client(2),
+    )
 
     assert result is not None
     mock_publisher.publish.assert_awaited_once()
@@ -222,9 +261,15 @@ async def test_process_query_submitted_uses_default_source_count(db_session: Asy
         topic=job.topic,
     )
 
-    result = await process_query_submitted(db_session, mock_publisher, inbound)
+    default_count = DEFAULT_SOURCE_COUNT_BY_DEPTH[QueryDepth.STANDARD]
+    result = await process_query_submitted(
+        db_session,
+        mock_publisher,
+        inbound,
+        search_client=_mock_tavily_client(default_count),
+    )
     assert result is not None
-    assert result.payload.source_count == DEFAULT_MOCK_SOURCE_COUNT
+    assert result.payload.source_count == default_count
 
 
 async def test_ingestion_worker_deletes_message_on_success() -> None:

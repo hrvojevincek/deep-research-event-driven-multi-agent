@@ -17,34 +17,45 @@ from eventforge.events.schemas import (
     build_ingestion_completed_event,
 )
 from eventforge.events.schemas.constants import DETAIL_TYPE_QUERY_SUBMITTED
-
-DEFAULT_MOCK_SOURCE_COUNT = 3
-
-
-def _mock_sources(job: Job, count: int) -> list[Source]:
-    sources: list[Source] = []
-    for index in range(1, count + 1):
-        sources.append(
-            Source(
-                job_id=job.id,
-                url=f"https://example.com/source/{job.id}/{index}",
-                title=f"Mock source {index} for {job.topic[:80]}",
-                snippet=f"Stub content about {job.topic[:120]} (source {index}).",
-            )
-        )
-    return sources
+from eventforge.services.search import (
+    TavilyClient,
+    get_tavily_client,
+    resolve_source_count,
+    resolve_tavily_search_depth,
+)
 
 
-async def _load_or_create_sources(session: AsyncSession, job: Job) -> list[Source]:
+async def _load_or_create_sources(
+    session: AsyncSession,
+    job: Job,
+    search_client: TavilyClient | None = None,
+) -> list[Source]:
     source_repo = SourceRepository(session)
     existing = await source_repo.list_by_job_id(job.id)
     if existing:
         return existing
 
-    source_count = (
-        job.max_sources if job.max_sources is not None else DEFAULT_MOCK_SOURCE_COUNT
+    client = search_client or get_tavily_client()
+    max_results = resolve_source_count(depth=job.depth, max_sources=job.max_sources)
+    search_depth = resolve_tavily_search_depth(job.depth)
+    results = await client.search(
+        job.topic,
+        max_results=max_results,
+        search_depth=search_depth,
     )
-    sources = _mock_sources(job, source_count)
+    if not results:
+        msg = f"Tavily returned no results for job {job.id}"
+        raise ValueError(msg)
+
+    sources = [
+        Source(
+            job_id=job.id,
+            url=result.url,
+            title=result.title,
+            snippet=result.snippet,
+        )
+        for result in results[:max_results]
+    ]
     session.add_all(sources)
     await session.flush()
     return sources
@@ -54,6 +65,8 @@ async def process_query_submitted(
     session: AsyncSession,
     publisher: EventPublisher,
     event: QuerySubmittedEvent,
+    *,
+    search_client: TavilyClient | None = None,
 ) -> IngestionCompletedEvent | None:
     """Run ingestion for one query.submitted event. Returns None if already processed."""
     processed_repo = ProcessedEventRepository(session)
@@ -79,7 +92,7 @@ async def process_query_submitted(
     if ingestion_stage.status != StageStatus.COMPLETED.value:
         await stage_repo.mark_running(ingestion_stage)
 
-    sources = await _load_or_create_sources(session, job)
+    sources = await _load_or_create_sources(session, job, search_client)
 
     completed_event = build_ingestion_completed_event(
         job_id=job.id,
