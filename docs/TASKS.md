@@ -115,25 +115,25 @@ When an issue closes → check the matching box below and ensure `KRE-xxx` link 
 
 ### 3.1 LLM Integration
 
-- [x] LLM client abstraction (OpenAI + Anthropic)
-- [ ] Ingestion: Tavily web search
-- [ ] Embedding: chunk real content + OpenAI `text-embedding-3-small`
-- [ ] Knowledge mining: RAG retrieval + entity extraction
-- [ ] Research: parallel focused sub-queries with LLM
-- [ ] Synthesis: structured report generation with citations
-- [ ] Cost tracking (`llm_usage` table + API endpoint) — table + repository done; API endpoint pending
+- [x] LLM client abstraction (OpenAI + Anthropic) — [KRE-139](https://linear.app/kreativbiro/issue/KRE-139)
+- [ ] Ingestion: Tavily web search — [KRE-140](https://linear.app/kreativbiro/issue/KRE-140)
+- [ ] Embedding: chunk real content + OpenAI `text-embedding-3-small` — [KRE-141](https://linear.app/kreativbiro/issue/KRE-141)
+- [ ] Knowledge mining: RAG retrieval + entity extraction — [KRE-143](https://linear.app/kreativbiro/issue/KRE-143)
+- [ ] Research: parallel focused sub-queries with LLM — [KRE-142](https://linear.app/kreativbiro/issue/KRE-142)
+- [ ] Synthesis: structured report generation with citations — [KRE-144](https://linear.app/kreativbiro/issue/KRE-144)
+- [ ] Cost tracking (`llm_usage` table + API endpoint) — table + repo done ([KRE-139](https://linear.app/kreativbiro/issue/KRE-139)); API → [KRE-145](https://linear.app/kreativbiro/issue/KRE-145)
 
 ### 3.2 Authentication (backend)
 
-- [ ] JWT validation middleware in FastAPI (Clerk JWKS)
-- [ ] User-scoped job queries
-- [ ] Replace mock user with authenticated `user_id` on all job records
+- [ ] JWT validation middleware in FastAPI (Clerk JWKS) — [KRE-146](https://linear.app/kreativbiro/issue/KRE-146)
+- [ ] User-scoped job queries — [KRE-146](https://linear.app/kreativbiro/issue/KRE-146)
+- [ ] Replace mock user with authenticated `user_id` on all job records — [KRE-146](https://linear.app/kreativbiro/issue/KRE-146)
 
 ### 3.3 Resilience Hardening
 
-- [ ] LLM retry with exponential backoff
-- [ ] Circuit breaker per provider
-- [ ] Per-query cost cap enforcement
+- [ ] LLM retry with exponential backoff — [KRE-147](https://linear.app/kreativbiro/issue/KRE-147)
+- [ ] Circuit breaker per provider — [KRE-147](https://linear.app/kreativbiro/issue/KRE-147)
+- [ ] Per-query cost cap enforcement — [KRE-147](https://linear.app/kreativbiro/issue/KRE-147)
 
 **Phase 3 exit criteria:** Real research query via API produces cited synthesis; backend auth enforced; LLM costs tracked. Verified via Postman + `./scripts/verify-pipeline-e2e.sh`.
 
@@ -285,6 +285,6 @@ Project: EventForge
 
 ## Current Priority
 
-**Backend-first track:** Phase 2 core pipeline complete (E2E + DLQ + `pipeline.failed`). **Next: Phase 3** — real AI agents (Tavily, embeddings, LLM). Frontend + SSE/React Flow deferred to **Phase 4** ([KRE-119](https://linear.app/kreativbiro/issue/KRE-119) onward).
+**Backend-first track:** Phase 2 complete. **Phase 3 in progress** — [KRE-139](https://linear.app/kreativbiro/issue/KRE-139) done; **next: [KRE-140](https://linear.app/kreativbiro/issue/KRE-140)** (Tavily ingestion). Frontend + SSE/React Flow deferred to **Phase 4** ([KRE-119](https://linear.app/kreativbiro/issue/KRE-119) onward).
 
 Verify: `./scripts/verify-pipeline-e2e.sh` · `./scripts/verify-dlq-redrive.sh` · run DLQ worker: `uv run --project backend python -m eventforge.workers.dlq`

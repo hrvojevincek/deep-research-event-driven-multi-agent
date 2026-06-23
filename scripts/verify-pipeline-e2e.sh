@@ -2,12 +2,9 @@
 # End-to-end pipeline smoke test: POST /api/v1/queries → poll until all stages complete.
 #
 # Prerequisites (all must be running):
-#   make dev  (postgres, localstack, backend)
-#   uv run --project backend python -m eventforge.workers.ingestion
-#   uv run --project backend python -m eventforge.workers.embedding
-#   uv run --project backend python -m eventforge.workers.knowledge
-#   uv run --project backend python -m eventforge.workers.research
-#   uv run --project backend python -m eventforge.workers.synthesis
+#   docker compose up -d postgres localstack
+#   uv run --project backend uvicorn eventforge.main:app --port 8000
+#   make workers   # or: make workers-overmind
 set -euo pipefail
 
 API_URL="${API_URL:-http://localhost:8000}"

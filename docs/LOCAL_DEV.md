@@ -219,21 +219,44 @@ OTEL_SERVICE_NAME=eventforge-api
 
 ## Running Workers Locally (Phase 2+)
 
-Workers run as separate processes consuming SQS:
+Workers run as separate processes consuming SQS. Use the root `Procfile` to start all six at once.
+
+**Recommended — Honcho** (included in backend dev deps, no extra install):
 
 ```bash
-cd backend
-
-# One terminal per worker (or use a process manager)
-uv run python -m eventforge.workers.ingestion
-uv run python -m eventforge.workers.embedding
-uv run python -m eventforge.workers.knowledge
-uv run python -m eventforge.workers.research
-uv run python -m eventforge.workers.synthesis
-uv run python -m eventforge.workers.dlq
+# Requires postgres + localstack (make dev or docker compose up postgres localstack)
+make workers
 ```
 
-Future: `docker compose --profile workers up` to run all workers.
+**Optional — Overmind** (macOS/Linux, tmux panes + per-process attach):
+
+```bash
+brew install overmind
+make workers-overmind
+# overmind connect ingestion   # attach to one worker
+# overmind restart research    # restart after code change
+```
+
+Run a single worker manually:
+
+```bash
+uv run --project backend python -m eventforge.workers.ingestion
+```
+
+### Hybrid dev loop (API + workers)
+
+```bash
+# Terminal 1: infrastructure
+docker compose up postgres localstack
+
+# Terminal 2: API
+cd backend && uv run uvicorn eventforge.main:app --reload --port 8000
+
+# Terminal 3: all workers
+make workers
+```
+
+Future: `docker compose --profile workers up` for CI / full-container stack.
 
 ---
 

@@ -33,7 +33,7 @@ save_issue(id: "KRE-122", state: "Done")
 | Phase 0 — Foundation    | Complete                                      |
 | Phase 1 — Scaffolding   | Backend complete; frontend → Phase 4          |
 | Phase 2 — Core Pipeline | Complete (stub agents + E2E)                |
-| Phase 3 — Real AI       | **Next** (backend-first)                      |
+| Phase 3 — Real AI       | **In progress** (KRE-139 done)                |
 | Phase 4 — Frontend      | Deferred (after Phase 3)                      |
 
 ## Issue index (Phase 0 + 1)
@@ -75,13 +75,30 @@ save_issue(id: "KRE-122", state: "Done")
 
 > Remaining Phase 2 polish (`GET /queries` list) stays in `docs/TASKS.md`. **Stage event schemas are added incrementally with each worker** — not upfront in KRE-122.
 
+## Issue index (Phase 3 — real AI & auth)
+
+| ID     | Linear                                                  | Title                                                 | Estimate | Blocked by |
+| ------ | ------------------------------------------------------- | ----------------------------------------------------- | -------- | ---------- |
+| EF-023 | [KRE-139](https://linear.app/kreativbiro/issue/KRE-139) | LLM client + cost tracking foundation                 | 3        | —          |
+| EF-024 | [KRE-140](https://linear.app/kreativbiro/issue/KRE-140) | Tavily web search ingestion                           | 3        | KRE-139    |
+| EF-025 | [KRE-141](https://linear.app/kreativbiro/issue/KRE-141) | Real embedding — chunking + OpenAI embeddings         | 3        | KRE-140    |
+| EF-026 | [KRE-143](https://linear.app/kreativbiro/issue/KRE-143) | Knowledge mining — RAG + entity extraction            | 3        | KRE-141    |
+| EF-027 | [KRE-142](https://linear.app/kreativbiro/issue/KRE-142) | Research — LLM parallel sub-queries                   | 3        | KRE-143    |
+| EF-028 | [KRE-144](https://linear.app/kreativbiro/issue/KRE-144) | Synthesis — cited report generation                   | 3        | KRE-142    |
+| EF-029 | [KRE-145](https://linear.app/kreativbiro/issue/KRE-145) | LLM cost tracking API endpoint                        | 2        | KRE-139    |
+| EF-030 | [KRE-146](https://linear.app/kreativbiro/issue/KRE-146) | Backend Clerk JWT auth + user-scoped queries          | 3        | —          |
+| EF-031 | [KRE-147](https://linear.app/kreativbiro/issue/KRE-147) | LLM resilience — retry, circuit breaker, cost cap     | 3        | KRE-139    |
+
 ## Backend-first track (recommended)
 
 ```
 Done:   KRE-118 → KRE-120 → KRE-123 → KRE-125 → KRE-122 → KRE-129 → KRE-130 → KRE-131 → KRE-132
         + all stub workers + E2E smoke test + KRE-134 (DLQ redrive) + KRE-135 (pipeline.failed)
 
-Next:   Phase 3 — real AI agents (Tavily, embeddings, LLM, backend auth)
+Next:   KRE-140 (Tavily ingestion) → KRE-141 → KRE-143 → KRE-142 → KRE-144
+        Parallel: KRE-145 (cost API), KRE-146 (Clerk auth), KRE-147 (resilience)
+
+Done:   KRE-139 (LLM client + cost tracking foundation)
 
 Defer:  Phase 4 frontend — KRE-119 → KRE-121 → KRE-124 → KRE-126 → KRE-128 (SSE, React Flow, Clerk UI)
 
