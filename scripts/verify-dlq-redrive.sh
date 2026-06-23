@@ -52,6 +52,7 @@ redrive = json.loads(os.environ["REDRIVE_RAW"])
 dlq_arn = os.environ["DLQ_ARN"]
 max_count = int(os.environ["MAX_RECEIVE_COUNT"])
 queue_name = os.environ["QUEUE_NAME"]
+prefix = os.environ["PREFIX"]
 
 if redrive.get("deadLetterTargetArn") != dlq_arn:
     print(f"{queue_name}: deadLetterTargetArn mismatch", file=sys.stderr)
@@ -65,7 +66,7 @@ if int(redrive.get("maxReceiveCount", 0)) != max_count:
     print("  got:     ", redrive.get("maxReceiveCount"), file=sys.stderr)
     sys.exit(1)
 
-print(f"OK  {queue_name} -> {os.environ['PREFIX']}-dlq (maxReceiveCount={max_count})")
+print(f"OK  {queue_name} -> {prefix}-dlq (maxReceiveCount={max_count})")
 '
 done
 
