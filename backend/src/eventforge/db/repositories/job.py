@@ -27,7 +27,9 @@ class JobRepository(BaseRepository):
 
     async def list_by_user_id(self, user_id: uuid.UUID) -> list[Job]:
         result = await self.session.execute(
-            select(Job).where(Job.user_id == user_id).order_by(Job.created_at.desc())
+            select(Job)
+            .where(Job.user_id == user_id)
+            .order_by(Job.created_at.desc(), Job.id.desc())
         )
         return list(result.scalars().all())
 

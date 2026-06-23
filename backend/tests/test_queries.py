@@ -217,22 +217,32 @@ async def test_list_queries_returns_mock_user_jobs(client: AsyncClient) -> None:
     )
     second = await client.post(
         "/api/v1/queries",
-        json={"topic": "Second list item", "depth": "deep"},
+        json={"topic": "Second list item", "depth": "deep", "max_sources": 3},
     )
     assert first.status_code == 201
     assert second.status_code == 201
+    first_id = first.json()["job_id"]
+    second_id = second.json()["job_id"]
 
     response = await client.get("/api/v1/queries")
 
     assert response.status_code == 200
     body = response.json()
-    assert len(body) >= 2
-    assert body[0]["job_id"] == second.json()["job_id"]
-    assert body[0]["topic"] == "Second list item"
-    assert body[0]["depth"] == "deep"
-    assert body[0]["status"] == "pending"
-    assert body[1]["job_id"] == first.json()["job_id"]
-    assert body[1]["topic"] == "First list item"
+    by_id = {item["job_id"]: item for item in body}
+
+    assert second_id in by_id
+    assert first_id in by_id
+    assert body.index(by_id[second_id]) < body.index(by_id[first_id])
+
+    assert by_id[second_id]["topic"] == "Second list item"
+    assert by_id[second_id]["depth"] == "deep"
+    assert by_id[second_id]["status"] == "pending"
+    assert by_id[second_id]["max_sources"] == 3
+    assert by_id[second_id]["correlation_id"] == second.json()["correlation_id"]
+
+    assert by_id[first_id]["topic"] == "First list item"
+    assert by_id[first_id]["depth"] == "standard"
+    assert by_id[first_id]["correlation_id"] == first.json()["correlation_id"]
 
 
 async def test_get_query_includes_synthesis_report_when_present(
