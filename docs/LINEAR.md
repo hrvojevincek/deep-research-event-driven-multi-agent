@@ -13,20 +13,20 @@
 
 ## Latest progress (2026-06-23)
 
-**[Project status update](https://linear.app/kreativbiro/project/eventforge-f35070f0931e/activity)** — on track.
+**[Project status update](https://linear.app/kreativbiro/project/eventforge-f35070f0931e/activity)** — Phase 3 agents complete; auth is the exit gate.
 
 | Done (Phase 3) | Next |
 | --- | --- |
-| KRE-139 LLM client + `llm_usage` | KRE-146 Clerk auth |
-| KRE-140 Tavily ingestion | Phase 4 frontend deferred |
-| KRE-141 real embeddings | |
+| KRE-139 LLM client + `llm_usage` | **KRE-146** Clerk JWT auth + user-scoped queries |
+| KRE-140 Tavily ingestion | Phase 4 frontend (KRE-119+) |
+| KRE-141 real embeddings | KRE-150 quality pass (optional) |
 | KRE-143 RAG + entity extraction | |
 | KRE-142 LLM research sub-queries | |
 | KRE-144 cited synthesis | |
-| KRE-145 LLM cost API | |
-| KRE-147 LLM resilience | |
+| KRE-145 LLM cost on `GET /queries/{id}` | |
+| KRE-147 LLM resilience (retry, breaker, cost cap) | |
 
-Phases 0–2 complete (stub pipeline + E2E). Full pipeline uses real AI through synthesis.
+Phases 0–2 complete. Full pipeline runs locally with real AI through cited synthesis (E2E verified).
 
 ## Agent workflow (Cursor + Linear MCP)
 
@@ -50,7 +50,7 @@ save_issue(id: "KRE-122", state: "Done")
 | Phase 0 — Foundation    | Complete                             |
 | Phase 1 — Scaffolding   | Backend complete; frontend → Phase 4 |
 | Phase 2 — Core Pipeline | Complete (stub agents + E2E)         |
-| Phase 3 — Real AI       | **In progress** (KRE-139–145, KRE-147 done; next KRE-146) |
+| Phase 3 — Real AI       | **In progress** — agents + resilience done; **KRE-146 auth** remaining |
 | Phase 4 — Frontend      | Deferred (after Phase 3)             |
 
 ## Issue index (Phase 0 + 1)
@@ -117,7 +117,7 @@ save_issue(id: "KRE-122", state: "Done")
 | EF-034 | [KRE-150](https://linear.app/kreativbiro/issue/KRE-150) | Post-Phase 3 quality pass (agents, API, resilience) | Medium   | KRE-144    |
 | EF-017 | [KRE-133](https://linear.app/kreativbiro/issue/KRE-133) | Automated RAG eval (faithfulness, citations, RAGAS) | Low      | KRE-144    |
 
-Also see deferred infra/reliability: KRE-136 (outbox), KRE-137, KRE-138, KRE-145, KRE-147.
+Also see deferred infra/reliability: KRE-136 (outbox), KRE-137, KRE-138.
 
 ## Backend-first track (recommended)
 

@@ -121,7 +121,7 @@ When an issue closes → check the matching box below and ensure `KRE-xxx` link 
 - [x] Knowledge mining: RAG retrieval + entity extraction — [KRE-143](https://linear.app/kreativbiro/issue/KRE-143)
 - [x] Research: parallel focused sub-queries with LLM — [KRE-142](https://linear.app/kreativbiro/issue/KRE-142)
 - [x] Synthesis: structured report generation with citations — [KRE-144](https://linear.app/kreativbiro/issue/KRE-144)
-- [x] Cost tracking (`llm_usage` table + API endpoint) — table + repo done ([KRE-139](https://linear.app/kreativbiro/issue/KRE-139)); API → [KRE-145](https://linear.app/kreativbiro/issue/KRE-145)
+- [x] Cost tracking (`llm_usage` table + API on `GET /queries/{id}`) — [KRE-139](https://linear.app/kreativbiro/issue/KRE-139) / [KRE-145](https://linear.app/kreativbiro/issue/KRE-145)
 
 ### 3.2 Authentication (backend)
 

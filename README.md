@@ -18,21 +18,23 @@ Turn open-ended research questions into **cited, multi-source syntheses** you ca
 
 **MVP done when:** A user submits a query → real agents run end-to-end → synthesis lands in the DB with citations → UI shows live pipeline progress and cost.
 
+**Backend MVP (Phase 3):** Real cited synthesis via API ✅ — Clerk auth is the remaining gate before Phase 3 exit.
+
 ---
 
 ## Where things stand
 
 **Strategy:** Backend-first. API + workers are testable via Postman/curl today; the Next.js dashboard comes after real AI agents work.
 
-| Phase | Focus                                                                         | Status                                                      |
-| ----- | ----------------------------------------------------------------------------- | ----------------------------------------------------------- |
-| **0** | Docs, Docker, LocalStack, Postgres + pgvector                                 | ✅ Done                                                     |
-| **1** | FastAPI backend, health checks, SQLAlchemy, Alembic                           | ✅ Done                                                     |
-| **2** | Event pipeline with **stub agents** (ingestion → synthesis), DLQ, idempotency | ✅ Done                                                     |
-| **3** | **Real AI** — full agent pipeline + auth/resilience                           | 🚧 **In progress** (KRE-139–144 done; auth/resilience next) |
-| **4** | Next.js UI, SSE live updates, React Flow visualization, Clerk                 | Planned                                                     |
-| **5** | AWS deploy (Terraform, ECS, Step Functions fan-out)                           | Planned                                                     |
-| **6** | Polish — demo GIF, E2E tests, RAG eval, cost dashboard                        | Planned                                                     |
+| Phase | Focus                                                                         | Status                                                                  |
+| ----- | ----------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| **0** | Docs, Docker, LocalStack, Postgres + pgvector                                 | ✅ Done                                                                 |
+| **1** | FastAPI backend, health checks, SQLAlchemy, Alembic                           | ✅ Done                                                                 |
+| **2** | Event pipeline with **stub agents** (ingestion → synthesis), DLQ, idempotency | ✅ Done                                                                 |
+| **3** | **Real AI** — full agent pipeline, cost API, resilience                       | 🚧 **Nearly done** — agents + resilience ✅; **KRE-146 auth** remaining |
+| **4** | Next.js UI, SSE live updates, React Flow visualization, Clerk                 | Planned                                                                 |
+| **5** | AWS deploy (Terraform, ECS, Step Functions fan-out)                           | Planned                                                                 |
+| **6** | Polish — demo GIF, E2E tests, RAG eval, cost dashboard                        | Planned                                                                 |
 
 Detail: [`docs/TASKS.md`](./docs/TASKS.md) · Linear: [`docs/LINEAR.md`](./docs/LINEAR.md)
 
@@ -59,11 +61,12 @@ POST /api/v1/queries  →  EventBridge  →  SQS workers  →  Postgres  →  GE
 | Real chunking + OpenAI `text-embedding-3-small` → pgvector      | ✅ [KRE-141](https://linear.app/kreativbiro/issue/KRE-141)                                                              |
 | RAG knowledge mining (vector retrieval + LLM entity extraction) | ✅ [KRE-143](https://linear.app/kreativbiro/issue/KRE-143)                                                              |
 | Real LLM research notes + cited synthesis                       | ✅ [KRE-142](https://linear.app/kreativbiro/issue/KRE-142) / ✅ [KRE-144](https://linear.app/kreativbiro/issue/KRE-144) |
-| LLM cost API endpoint                                           | ✅ [KRE-145](https://linear.app/kreativbiro/issue/KRE-145)                                                              |
-| Backend JWT auth (Clerk)                                        | ⬜ [KRE-146](https://linear.app/kreativbiro/issue/KRE-146)                                                              |
+| LLM cost summary on `GET /api/v1/queries/{id}`                  | ✅ [KRE-145](https://linear.app/kreativbiro/issue/KRE-145)                                                              |
+| LLM resilience (retry, circuit breaker, per-job cost cap)       | ✅ [KRE-147](https://linear.app/kreativbiro/issue/KRE-147)                                                              |
+| Backend JWT auth (Clerk)                                        | ⬜ [KRE-146](https://linear.app/kreativbiro/issue/KRE-146) — mock user for local dev                                    |
 | Dashboard / React Flow                                          | ⬜ Phase 4                                                                                                              |
 
-**Smoke test:** `./scripts/verify-pipeline-e2e.sh` (requires API + all workers running — see [Local dev](#local-dev))
+**Smoke test:** `./scripts/verify-pipeline-e2e.sh` or `make verify-e2e` (API + all workers; real LLM run ~2–3 min with one research worker)
 
 ---
 
@@ -98,17 +101,18 @@ Full diagrams: [`docs/ARCHITECTURE.md`](./docs/ARCHITECTURE.md)
 
 ## Stack
 
-| Layer                    | Tech                                                                               |
-| ------------------------ | ---------------------------------------------------------------------------------- |
-| **API**                  | Python 3.12+, FastAPI, Pydantic v2, SQLAlchemy 2.0, uv                             |
-| **Workers**              | Async SQS consumers, one module per pipeline stage                                 |
-| **Events**               | AWS EventBridge + SQS (+ Step Functions for research fan-out in prod)              |
-| **Data**                 | Postgres 16 + pgvector                                                             |
-| **LLM** _(Phase 3)_      | OpenAI + Anthropic client; Tavily search; OpenAI embeddings; RAG entity extraction |
-| **Frontend** _(Phase 4)_ | Next.js 15, Tailwind, shadcn/ui, React Flow                                        |
-| **Auth** _(Phase 3–4)_   | Clerk JWT → FastAPI                                                                |
-| **IaC** _(Phase 5)_      | Terraform                                                                          |
-| **Local**                | Docker Compose + LocalStack                                                        |
+| Layer                    | Tech                                                                                    |
+| ------------------------ | --------------------------------------------------------------------------------------- |
+| **API**                  | Python 3.12+, FastAPI, Pydantic v2, SQLAlchemy 2.0, uv                                  |
+| **Workers**              | Async SQS consumers, one module per pipeline stage                                      |
+| **Events**               | AWS EventBridge + SQS (+ Step Functions for research fan-out in prod)                   |
+| **Data**                 | Postgres 16 + pgvector                                                                  |
+| **LLM**                  | OpenAI + Anthropic client; Tavily search; OpenAI embeddings; RAG; cited synthesis       |
+| **Resilience**           | Exponential backoff retries, per-provider circuit breakers, optional `JOB_MAX_COST_USD` |
+| **Frontend** _(Phase 4)_ | Next.js 15, Tailwind, shadcn/ui, React Flow                                             |
+| **Auth** _(Phase 3–4)_   | Clerk JWT → FastAPI (backend: KRE-146 pending; local uses mock user)                    |
+| **IaC** _(Phase 5)_      | Terraform                                                                               |
+| **Local**                | Docker Compose + LocalStack                                                             |
 
 ---
 
@@ -124,7 +128,7 @@ make dev                    # Postgres + LocalStack + backend
 cd backend && uv run alembic upgrade head   # migrations
 ```
 
-**Phase 3 API keys** (in `.env` — required for real ingestion → knowledge path):
+**Phase 3 API keys** (in `.env` — required for real ingestion → synthesis path):
 
 ```bash
 OPENAI_API_KEY=sk-...
@@ -132,6 +136,8 @@ ANTHROPIC_API_KEY=sk-ant-...   # optional second provider
 TAVILY_API_KEY=tvly-...        # web search (ingestion)
 LLM_DEFAULT_MODEL=gpt-4o-mini
 KNOWLEDGE_RAG_TOP_K=10         # optional — RAG retrieval limit
+KNOWLEDGE_MAX_ENTITIES=4       # optional — caps research fan-out
+JOB_MAX_COST_USD=2.0           # optional — per-job LLM spend cap (omit to disable)
 ```
 
 **Hybrid (hot reload):** run infra in Docker, API natively:
@@ -141,7 +147,13 @@ docker compose up postgres localstack
 cd backend && uv sync && uv run uvicorn eventforge.main:app --reload --port 8000
 ```
 
-**Workers** (one terminal each — required for pipeline to complete):
+**Workers** (required for pipeline to complete):
+
+```bash
+make workers   # all 5 workers + DLQ handler via Honcho (Procfile)
+```
+
+Or one terminal each:
 
 ```bash
 uv run --project backend python -m eventforge.workers.ingestion
@@ -162,7 +174,7 @@ curl -X POST http://localhost:8000/api/v1/queries \
   -H "Content-Type: application/json" \
   -d '{"topic": "Event-driven architecture patterns", "depth": "standard"}'
 
-# Poll job detail (use job_id from response)
+# Poll job detail (use job_id from response) — includes stages, synthesis, llm_usage
 curl http://localhost:8000/api/v1/queries/{job_id}
 ```
 
@@ -180,6 +192,9 @@ event-driven/
 │   ├── services/llm/         # LLM client + OpenAI/Anthropic providers
 │   ├── services/embedding/   # Chunking + OpenAI embeddings
 │   ├── services/knowledge/   # RAG retrieval + entity extraction
+│   ├── services/research/    # Sub-query generation + note synthesis
+│   ├── services/synthesis/   # Cited report generation
+│   ├── services/resilience/  # Retry, circuit breaker, cost cap
 │   └── services/search/      # Tavily client
 ├── shared/events/            # JSON Schema contracts (source of truth)
 ├── infra/                    # Terraform, LocalStack init, Docker
