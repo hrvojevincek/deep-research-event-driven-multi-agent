@@ -6,6 +6,7 @@ from eventforge.db.repositories.base import BaseRepository
 
 
 class ProcessedEventRepository(BaseRepository):
+    """Idempotency claims for event processing."""
     async def try_claim(self, event_id: str, worker_name: str) -> bool:
         """Atomically claim an event for a worker.
 

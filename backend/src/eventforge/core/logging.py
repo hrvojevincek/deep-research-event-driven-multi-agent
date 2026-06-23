@@ -7,6 +7,7 @@ from eventforge.core.config import Settings
 
 
 class JsonFormatter(logging.Formatter):
+    """Structured JSON log formatter for non-local environments."""
     def format(self, record: logging.LogRecord) -> str:
         payload: dict[str, object] = {
             "timestamp": datetime.fromtimestamp(record.created, tz=UTC).isoformat(),

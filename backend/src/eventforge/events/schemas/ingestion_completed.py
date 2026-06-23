@@ -12,6 +12,8 @@ from eventforge.events.schemas.envelope import EventEnvelope
 
 
 class IngestionCompletedPayload(BaseModel):
+    """Source IDs produced by the ingestion stage."""
+
     model_config = ConfigDict(extra="forbid")
 
     source_ids: list[UUID] = Field(min_length=1)
@@ -19,6 +21,8 @@ class IngestionCompletedPayload(BaseModel):
 
 
 class IngestionCompletedEvent(EventEnvelope):
+    """Emitted after sources are stored (eventforge.ingestion.completed)."""
+
     detail_type: Literal["eventforge.ingestion.completed"] = DETAIL_TYPE_INGESTION_COMPLETED
     schema_version: Literal["1.0"] = INGESTION_COMPLETED_SCHEMA_VERSION
     payload: IngestionCompletedPayload

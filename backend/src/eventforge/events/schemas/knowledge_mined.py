@@ -12,6 +12,8 @@ from eventforge.events.schemas.envelope import EventEnvelope
 
 
 class KnowledgeMinedPayload(BaseModel):
+    """Knowledge entity IDs produced by the knowledge mining stage."""
+
     model_config = ConfigDict(extra="forbid")
 
     entity_ids: list[UUID] = Field(min_length=1)
@@ -19,6 +21,8 @@ class KnowledgeMinedPayload(BaseModel):
 
 
 class KnowledgeMinedEvent(EventEnvelope):
+    """Emitted after entities are extracted (eventforge.knowledge.mined)."""
+
     detail_type: Literal["eventforge.knowledge.mined"] = DETAIL_TYPE_KNOWLEDGE_MINED
     schema_version: Literal["1.0"] = KNOWLEDGE_MINED_SCHEMA_VERSION
     payload: KnowledgeMinedPayload

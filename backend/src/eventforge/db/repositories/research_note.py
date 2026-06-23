@@ -7,6 +7,7 @@ from eventforge.db.repositories.base import BaseRepository
 
 
 class ResearchNoteRepository(BaseRepository):
+    """Access research notes produced by parallel sub-tasks."""
     async def list_by_job_id(self, job_id: uuid.UUID) -> list[ResearchNote]:
         result = await self.session.execute(
             select(ResearchNote)

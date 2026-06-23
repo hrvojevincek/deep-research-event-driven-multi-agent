@@ -12,6 +12,8 @@ from eventforge.events.schemas.envelope import EventEnvelope
 
 
 class SynthesisCompletedPayload(BaseModel):
+    """Report ID and note count from the synthesis stage."""
+
     model_config = ConfigDict(extra="forbid")
 
     report_id: UUID
@@ -19,6 +21,8 @@ class SynthesisCompletedPayload(BaseModel):
 
 
 class SynthesisCompletedEvent(EventEnvelope):
+    """Emitted when the final report is ready (eventforge.synthesis.completed)."""
+
     detail_type: Literal["eventforge.synthesis.completed"] = DETAIL_TYPE_SYNTHESIS_COMPLETED
     schema_version: Literal["1.0"] = SYNTHESIS_COMPLETED_SCHEMA_VERSION
     payload: SynthesisCompletedPayload

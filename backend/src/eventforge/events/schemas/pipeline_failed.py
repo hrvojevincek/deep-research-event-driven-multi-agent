@@ -12,6 +12,8 @@ from eventforge.events.schemas.envelope import EventEnvelope
 
 
 class PipelineFailedPayload(BaseModel):
+    """Details about a terminal pipeline failure."""
+
     model_config = ConfigDict(extra="forbid")
 
     stage: str = Field(min_length=1)
@@ -23,6 +25,8 @@ class PipelineFailedPayload(BaseModel):
 
 
 class PipelineFailedEvent(EventEnvelope):
+    """Emitted when a stage fails terminally (eventforge.pipeline.failed)."""
+
     detail_type: Literal["eventforge.pipeline.failed"] = DETAIL_TYPE_PIPELINE_FAILED
     schema_version: Literal["1.0"] = PIPELINE_FAILED_SCHEMA_VERSION
     payload: PipelineFailedPayload

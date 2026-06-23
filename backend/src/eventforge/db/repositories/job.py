@@ -9,6 +9,7 @@ from eventforge.db.repositories.base import BaseRepository
 
 
 class JobRepository(BaseRepository):
+    """Read and list research jobs."""
     async def get_by_id(self, job_id: uuid.UUID) -> Job | None:
         result = await self.session.execute(
             select(Job)
@@ -35,6 +36,7 @@ class JobRepository(BaseRepository):
 
 
 class JobStageRepository(BaseRepository):
+    """Track and update per-stage execution status on a job."""
     async def get_by_job_and_stage(self, job_id: uuid.UUID, stage: str) -> JobStage | None:
         result = await self.session.execute(
             select(JobStage).where(JobStage.job_id == job_id, JobStage.stage == stage)

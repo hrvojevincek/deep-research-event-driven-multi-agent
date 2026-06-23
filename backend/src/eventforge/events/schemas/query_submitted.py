@@ -13,6 +13,8 @@ from eventforge.events.schemas.envelope import EventEnvelope
 
 
 class QueryDepth(StrEnum):
+    """Research depth preset controlling source count and thoroughness."""
+
     QUICK = "quick"
     STANDARD = "standard"
     DEEP = "deep"
@@ -29,6 +31,8 @@ class QuerySubmittedPayload(BaseModel):
 
 
 class QuerySubmittedEvent(EventEnvelope):
+    """Emitted when the API accepts a new research query (eventforge.query.submitted)."""
+
     detail_type: Literal["eventforge.query.submitted"] = DETAIL_TYPE_QUERY_SUBMITTED
     schema_version: Literal["1.0"] = QUERY_SUBMITTED_SCHEMA_VERSION
     payload: QuerySubmittedPayload

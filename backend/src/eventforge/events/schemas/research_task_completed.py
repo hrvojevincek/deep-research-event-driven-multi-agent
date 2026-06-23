@@ -12,6 +12,8 @@ from eventforge.events.schemas.envelope import EventEnvelope
 
 
 class ResearchTaskCompletedPayload(BaseModel):
+    """Result of one completed research sub-task."""
+
     model_config = ConfigDict(extra="forbid")
 
     task_id: UUID
@@ -20,6 +22,8 @@ class ResearchTaskCompletedPayload(BaseModel):
 
 
 class ResearchTaskCompletedEvent(EventEnvelope):
+    """Emitted when a research sub-task finishes (eventforge.research.task.completed)."""
+
     detail_type: Literal["eventforge.research.task.completed"] = (
         DETAIL_TYPE_RESEARCH_TASK_COMPLETED
     )

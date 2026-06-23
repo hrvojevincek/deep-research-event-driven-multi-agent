@@ -17,6 +17,8 @@ logger = logging.getLogger(__name__)
 
 
 class SynthesisWorker(SqsConsumer):
+    """Consumes research.task.completed events and runs the synthesis agent."""
+
     def __init__(self) -> None:
         settings = get_settings()
         super().__init__(settings.synthesis_queue_name, settings)

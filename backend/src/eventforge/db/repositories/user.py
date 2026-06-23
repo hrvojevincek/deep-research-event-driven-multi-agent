@@ -11,6 +11,7 @@ MOCK_USER_EMAIL = "mock@local.eventforge"
 
 
 class UserRepository(BaseRepository):
+    """Look up and provision users (mock user for local dev)."""
     async def get_by_id(self, user_id: uuid.UUID) -> User | None:
         result = await self.session.execute(select(User).where(User.id == user_id))
         return result.scalar_one_or_none()

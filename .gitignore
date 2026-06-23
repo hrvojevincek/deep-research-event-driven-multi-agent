@@ -65,3 +65,6 @@ tmp/
 *.pem
 credentials.json
 secrets/
+
+/graphify-scan/
+/graphify-out

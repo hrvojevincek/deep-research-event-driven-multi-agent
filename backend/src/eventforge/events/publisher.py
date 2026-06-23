@@ -24,6 +24,7 @@ class EventPublishError(Exception):
 
 
 class PublishableEvent(Protocol):
+    """Minimal interface for events sent to EventBridge."""
     @property
     def detail_type(self) -> str: ...
 
@@ -31,6 +32,7 @@ class PublishableEvent(Protocol):
 
 
 class EventPublisher:
+    """Publishes pipeline events to the EventBridge bus."""
     def __init__(self, settings: Settings | None = None) -> None:
         self._settings = settings or get_settings()
         self._client: Any | None = None

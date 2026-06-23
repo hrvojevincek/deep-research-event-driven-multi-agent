@@ -14,6 +14,8 @@ logger = logging.getLogger(__name__)
 
 
 class DlqWorker(SqsConsumer):
+    """Consumes poison messages from the DLQ and emits pipeline.failed events."""
+
     def __init__(self) -> None:
         settings = get_settings()
         super().__init__(settings.dlq_queue_name, settings)
@@ -31,7 +33,8 @@ class DlqWorker(SqsConsumer):
             )
             return
 
-        receive_count_raw = message.get("Attributes", {}).get("ApproximateReceiveCount")
+        receive_count_raw = message.get(
+            "Attributes", {}).get("ApproximateReceiveCount")
         receive_count = int(receive_count_raw) if receive_count_raw else None
 
         async with self._session_factory() as session:

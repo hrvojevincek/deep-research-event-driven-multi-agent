@@ -7,6 +7,7 @@ from eventforge.db.repositories.base import BaseRepository
 
 
 class KnowledgeEntityRepository(BaseRepository):
+    """Access knowledge entities mined from document chunks."""
     async def list_by_job_id(self, job_id: uuid.UUID) -> list[KnowledgeEntity]:
         result = await self.session.execute(
             select(KnowledgeEntity)

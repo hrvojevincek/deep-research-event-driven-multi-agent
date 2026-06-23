@@ -7,6 +7,7 @@ from eventforge.db.repositories.base import BaseRepository
 
 
 class SourceRepository(BaseRepository):
+    """Access ingested web sources for a job."""
     async def list_by_job_id(self, job_id: uuid.UUID) -> list[Source]:
         result = await self.session.execute(
             select(Source).where(Source.job_id == job_id).order_by(Source.created_at)

@@ -7,6 +7,7 @@ from eventforge.db.repositories.base import BaseRepository
 
 
 class SynthesisReportRepository(BaseRepository):
+    """Access the final synthesis report for a job."""
     async def get_by_job_id(self, job_id: uuid.UUID) -> SynthesisReport | None:
         result = await self.session.execute(
             select(SynthesisReport).where(SynthesisReport.job_id == job_id)

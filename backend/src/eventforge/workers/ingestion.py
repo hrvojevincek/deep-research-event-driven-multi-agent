@@ -14,6 +14,8 @@ logger = logging.getLogger(__name__)
 
 
 class IngestionWorker(SqsConsumer):
+    """Consumes query.submitted events and runs the ingestion agent."""
+
     def __init__(self) -> None:
         settings = get_settings()
         super().__init__(settings.ingestion_queue_name, settings)

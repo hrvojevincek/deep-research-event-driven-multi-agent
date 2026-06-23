@@ -11,10 +11,11 @@ from eventforge.events.schemas.constants import MOCK_EMBEDDING_DIMENSION
 
 
 class Base(DeclarativeBase):
-    pass
+    """SQLAlchemy declarative base for all ORM models."""
 
 
 class JobStatus(StrEnum):
+    """Lifecycle states for a research job."""
     PENDING = "pending"
     RUNNING = "running"
     COMPLETED = "completed"
@@ -22,6 +23,7 @@ class JobStatus(StrEnum):
 
 
 class JobStageName(StrEnum):
+    """Named stages in the pipeline, in execution order."""
     INGESTION = "ingestion"
     EMBEDDING = "embedding"
     KNOWLEDGE_MINING = "knowledge_mining"
@@ -30,6 +32,7 @@ class JobStageName(StrEnum):
 
 
 class StageStatus(StrEnum):
+    """Per-stage execution states."""
     PENDING = "pending"
     RUNNING = "running"
     COMPLETED = "completed"
@@ -37,6 +40,8 @@ class StageStatus(StrEnum):
 
 
 class User(Base):
+    """Authenticated user, linked to Clerk via clerk_id."""
+
     __tablename__ = "users"
 
     id: Mapped[uuid.UUID] = mapped_column(
@@ -59,6 +64,8 @@ class User(Base):
 
 
 class Job(Base):
+    """A research query and its overall pipeline state."""
+
     __tablename__ = "jobs"
 
     id: Mapped[uuid.UUID] = mapped_column(
@@ -105,6 +112,8 @@ class Job(Base):
 
 
 class JobStage(Base):
+    """Execution record for one pipeline stage on a job."""
+
     __tablename__ = "job_stages"
     __table_args__ = (
         UniqueConstraint(
@@ -139,6 +148,8 @@ class JobStage(Base):
 
 
 class Source(Base):
+    """Web source discovered during ingestion."""
+
     __tablename__ = "sources"
 
     id: Mapped[uuid.UUID] = mapped_column(
@@ -159,6 +170,8 @@ class Source(Base):
 
 
 class DocumentChunk(Base):
+    """Chunked source text with a pgvector embedding."""
+
     __tablename__ = "document_chunks"
     __table_args__ = (
         UniqueConstraint(
@@ -194,6 +207,8 @@ class DocumentChunk(Base):
 
 
 class KnowledgeEntity(Base):
+    """Entity extracted from a document chunk during knowledge mining."""
+
     __tablename__ = "knowledge_entities"
 
     id: Mapped[uuid.UUID] = mapped_column(
@@ -219,6 +234,8 @@ class KnowledgeEntity(Base):
 
 
 class ResearchNote(Base):
+    """Output of one parallel research sub-task."""
+
     __tablename__ = "research_notes"
     __table_args__ = (
         UniqueConstraint("job_id", "task_index", name="uq_research_notes_job_id_task_index"),
@@ -243,6 +260,8 @@ class ResearchNote(Base):
 
 
 class SynthesisReport(Base):
+    """Final synthesized report for a completed job."""
+
     __tablename__ = "synthesis_reports"
 
     id: Mapped[uuid.UUID] = mapped_column(
@@ -264,6 +283,8 @@ class SynthesisReport(Base):
 
 
 class ProcessedEvent(Base):
+    """Idempotency record — composite PK (event_id, worker_name)."""
+
     __tablename__ = "processed_events"
 
     # Composite PK lets each consumer claim the same event_id independently

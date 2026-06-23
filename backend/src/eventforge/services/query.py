@@ -20,6 +20,8 @@ logger = logging.getLogger(__name__)
 
 @dataclass(frozen=True)
 class SubmitQueryResult:
+    """Identifiers returned after a query is submitted and persisted."""
+
     job_id: uuid.UUID
     correlation_id: str
 

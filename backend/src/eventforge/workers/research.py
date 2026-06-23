@@ -23,6 +23,8 @@ logger = logging.getLogger(__name__)
 
 
 class ResearchWorker(SqsConsumer):
+    """Consumes knowledge.mined and research.task.dispatched events."""
+
     def __init__(self) -> None:
         settings = get_settings()
         super().__init__(settings.research_queue_name, settings)

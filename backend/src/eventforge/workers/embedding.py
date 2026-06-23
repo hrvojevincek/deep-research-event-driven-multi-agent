@@ -14,6 +14,8 @@ logger = logging.getLogger(__name__)
 
 
 class EmbeddingWorker(SqsConsumer):
+    """Consumes ingestion.completed events and runs the embedding agent."""
+
     def __init__(self) -> None:
         settings = get_settings()
         super().__init__(settings.embedding_queue_name, settings)

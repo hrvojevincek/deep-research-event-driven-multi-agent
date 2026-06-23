@@ -33,6 +33,17 @@ eventforge/
 - Structured JSON logs in prod; include `correlation_id`, `job_id`, `agent_name`
 - OTEL span per agent step: `agent.{name}.{action}`
 
+## Docstrings
+
+Every class needs a one-line docstring describing its role:
+
+```python
+class IngestionWorker(SqsConsumer):
+    """Consumes query.submitted events and runs the ingestion agent."""
+```
+
+Apply to ORM models, repositories, workers, Pydantic schemas (request/response + event payload/event pairs), services, and exceptions. Match existing tone — purpose, not a field inventory. Non-obvious public methods may get a short docstring too.
+
 ## API conventions
 
 - Prefix: `/api/v1`

@@ -12,6 +12,8 @@ from eventforge.events.schemas.envelope import EventEnvelope
 
 
 class ResearchTaskDispatchedPayload(BaseModel):
+    """One parallel research sub-task dispatched to the research worker."""
+
     model_config = ConfigDict(extra="forbid")
 
     task_id: UUID
@@ -21,6 +23,8 @@ class ResearchTaskDispatchedPayload(BaseModel):
 
 
 class ResearchTaskDispatchedEvent(EventEnvelope):
+    """Emitted to fan out a research sub-task (eventforge.research.task.dispatched)."""
+
     detail_type: Literal["eventforge.research.task.dispatched"] = (
         DETAIL_TYPE_RESEARCH_TASK_DISPATCHED
     )

@@ -10,14 +10,14 @@ Event-driven multi-agent research platform. Users submit queries → async agent
 
 ## Cursor Rules (primary context)
 
-| Rule | Scope | Loads when |
-|------|-------|------------|
-| `eventforge-core.mdc` | Stack, architecture, commands, behavior | **Always** |
-| `backend-python.mdc` | FastAPI, agents, workers, DB | `backend/**` |
-| `frontend-nextjs.mdc` | Next.js, React Flow, SSE | `frontend/**` |
-| `event-pipeline.mdc` | Events, idempotency, stage contracts | agents/workers/events |
-| `infra-aws.mdc` | Docker, LocalStack, Terraform | `infra/**` |
-| `docs-workflow.mdc` | TASKS, phases, Linear sync | `docs/**` |
+| Rule                  | Scope                                   | Loads when            |
+| --------------------- | --------------------------------------- | --------------------- |
+| `eventforge-core.mdc` | Stack, architecture, commands, behavior | **Always**            |
+| `backend-python.mdc`  | FastAPI, agents, workers, DB            | `backend/**`          |
+| `frontend-nextjs.mdc` | Next.js, React Flow, SSE                | `frontend/**`         |
+| `event-pipeline.mdc`  | Events, idempotency, stage contracts    | agents/workers/events |
+| `infra-aws.mdc`       | Docker, LocalStack, Terraform           | `infra/**`            |
+| `docs-workflow.mdc`   | TASKS, phases, Linear sync              | `docs/**`             |
 
 Deep reference (read on demand): `docs/ARCHITECTURE.md`, `docs/PRD.md`, `docs/TECH_DECISIONS.md`, `docs/LOCAL_DEV.md`
 
@@ -41,6 +41,7 @@ Phase 1+: `uv run uvicorn eventforge.main:app --reload` | `npm run dev`
 - DLQ: `eventforge-dlq`
 - `correlation_id` for tracing + SSE + React Flow
 - Cost tracking in `llm_usage`
+- **Docstrings:** new Python classes get a one-line purpose docstring (see `backend-python.mdc`)
 
 ## Current phase
 
@@ -48,9 +49,9 @@ Phase 1+: `uv run uvicorn eventforge.main:app --reload` | `npm run dev`
 
 ## User shortcuts
 
-- *"What's next in EventForge?"* → Linear MCP
-- *"Implement KRE-xxx"* → issue acceptance criteria
-- *"Mark KRE-xxx done"* → Linear + TASKS.md sync
+- _"What's next in EventForge?"_ → Linear MCP
+- _"Implement KRE-xxx"_ → issue acceptance criteria
+- _"Mark KRE-xxx done"_ → Linear + TASKS.md sync
 
 ## Linear
 

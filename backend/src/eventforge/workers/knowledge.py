@@ -14,6 +14,8 @@ logger = logging.getLogger(__name__)
 
 
 class KnowledgeWorker(SqsConsumer):
+    """Consumes embedding.completed events and runs the knowledge mining agent."""
+
     def __init__(self) -> None:
         settings = get_settings()
         super().__init__(settings.knowledge_mining_queue_name, settings)
