@@ -1,5 +1,9 @@
 import type { Metadata } from "next";
 import { Geist_Mono, JetBrains_Mono } from "next/font/google";
+
+import { AppShell } from "@/components/layout/app-shell";
+import { ThemeProvider } from "@/components/theme-provider";
+
 import "./globals.css";
 
 const geistMono = Geist_Mono({
@@ -25,9 +29,14 @@ export default function RootLayout({
   return (
     <html
       lang="en"
+      suppressHydrationWarning
       className={`${geistMono.variable} ${jetbrainsMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full">
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          <AppShell>{children}</AppShell>
+        </ThemeProvider>
+      </body>
     </html>
   );
 }
