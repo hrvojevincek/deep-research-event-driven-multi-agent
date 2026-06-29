@@ -43,7 +43,7 @@ async def db_session() -> AsyncSession:
 async def _seed_job_with_stages(db_session: AsyncSession) -> Job:
     suffix = uuid.uuid4().hex[:8]
     user = User(email=f"fail-{suffix}@example.com",
-                clerk_id=f"fail-user-{suffix}")
+                auth_subject_id=f"fail-user-{suffix}")
     db_session.add(user)
     await db_session.flush()
 

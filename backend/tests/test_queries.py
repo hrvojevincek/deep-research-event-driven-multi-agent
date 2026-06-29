@@ -13,7 +13,7 @@ from eventforge.api.routes.queries import get_publisher
 from eventforge.core.aws import BOTO_CONNECT_TIMEOUT_SECONDS, BOTO_READ_TIMEOUT_SECONDS
 from eventforge.core.config import get_settings
 from eventforge.db.models import Job, JobStageName, ProcessedEvent, SynthesisReport
-from eventforge.db.repositories import JobRepository, ProcessedEventRepository
+from eventforge.db.repositories import JobRepository, ProcessedEventRepository, UserRepository
 from eventforge.db.session import reset_engine
 from eventforge.events.publisher import (
     EVENT_SOURCE_API,
@@ -85,10 +85,12 @@ async def test_submit_query_requires_topic(client: AsyncClient) -> None:
 
 async def test_submit_query_records_processed_event(db_session: AsyncSession) -> None:
     mock_publisher = AsyncMock(spec=EventPublisher)
+    user = await UserRepository(db_session).get_or_create_mock_user()
 
     result = await submit_query(
         db_session,
         mock_publisher,
+        user,
         topic="Idempotency test",
         depth=QueryDepth.STANDARD,
     )
@@ -121,7 +123,8 @@ async def test_submit_query_skips_publish_when_event_already_processed(
     )
 
     with patch("eventforge.services.query.build_query_submitted_event", return_value=fixed_event):
-        await submit_query(db_session, mock_publisher, topic="Existing")
+        user = await UserRepository(db_session).get_or_create_mock_user()
+        await submit_query(db_session, mock_publisher, user, topic="Existing")
 
     mock_publisher.publish_query_submitted.assert_not_awaited()
 

@@ -17,7 +17,7 @@ Event-driven multi-agent research platform. Users submit queries → EventBridge
 | Backend | Python 3.12+, FastAPI, Pydantic v2, SQLAlchemy 2.0 |
 | Events | AWS EventBridge + SQS + Step Functions |
 | Data | Postgres 16 + pgvector |
-| Auth | Clerk JWT → FastAPI validation |
+| Auth | Cognito JWT → FastAPI validation |
 | Observability | OpenTelemetry → OTLP |
 | IaC | Terraform (`infra/terraform/`) |
 | Local | Docker Compose + LocalStack |

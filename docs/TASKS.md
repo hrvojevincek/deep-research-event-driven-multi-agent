@@ -125,9 +125,10 @@ When an issue closes → check the matching box below and ensure `KRE-xxx` link 
 
 ### 3.2 Authentication (backend)
 
-- [ ] JWT validation middleware in FastAPI (Clerk JWKS) — [KRE-146](https://linear.app/kreativbiro/issue/KRE-146)
-- [ ] User-scoped job queries — [KRE-146](https://linear.app/kreativbiro/issue/KRE-146)
-- [ ] Replace mock user with authenticated `user_id` on all job records — [KRE-146](https://linear.app/kreativbiro/issue/KRE-146)
+- [x] JWT validation in FastAPI (Cognito JWKS) — [KRE-146](https://linear.app/kreativbiro/issue/KRE-146)
+- [x] Rename `clerk_id` → `auth_subject_id`; provision `User` from Cognito `sub` — [KRE-146](https://linear.app/kreativbiro/issue/KRE-146)
+- [x] User-scoped job queries (`POST/GET /queries`) — [KRE-146](https://linear.app/kreativbiro/issue/KRE-146)
+- [x] Local dev: `AUTH_DISABLED` bypass + dev Cognito pool docs — [KRE-146](https://linear.app/kreativbiro/issue/KRE-146)
 
 ### 3.3 Resilience Hardening
 
@@ -177,10 +178,10 @@ When an issue closes → check the matching box below and ensure `KRE-xxx` link 
 - [ ] Source list with expandable snippets
 - [ ] Job history page
 
-### 4.4 Authentication (Clerk UI)
+### 4.4 Authentication (Cognito UI)
 
-- [ ] Clerk integration in Next.js
-- [ ] Pass JWT to API client; protected routes via Clerk middleware
+- [ ] Cognito Hosted UI or Amplify Auth in Next.js
+- [ ] Pass Cognito ID token to API client; protect routes (middleware or client-side guard)
 
 ### 4.5 Observability (Local)
 
@@ -205,6 +206,7 @@ When an issue closes → check the matching box below and ensure `KRE-xxx` link 
 - [ ] `modules/step-functions` — research fan-out workflow
 - [ ] `modules/ecs` — API + worker services (Fargate)
 - [ ] `modules/observability` — CloudWatch, ADOT
+- [ ] `modules/cognito` — user pool, app client, callback URLs
 - [ ] `environments/dev` — compose modules
 - [ ] Secrets Manager for API keys
 
@@ -285,6 +287,6 @@ Project: EventForge
 
 ## Current Priority
 
-**Backend-first track:** Phase 2 complete. **Phase 3 in progress** — KRE-139–145, KRE-147 done; **next:** KRE-146 (Clerk auth). Frontend deferred to **Phase 4** ([KRE-119](https://linear.app/kreativbiro/issue/KRE-119) onward).
+**Backend-first track:** Phase 2 complete. **Phase 3 complete** — KRE-139–147 done including KRE-146 (Cognito JWT auth). **Next:** Phase 4 frontend ([KRE-119](https://linear.app/kreativbiro/issue/KRE-119) onward).
 
 Verify: `./scripts/verify-pipeline-e2e.sh` · `./scripts/verify-dlq-redrive.sh` · run DLQ worker: `uv run --project backend python -m eventforge.workers.dlq`

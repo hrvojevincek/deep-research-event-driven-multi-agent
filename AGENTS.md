@@ -22,7 +22,7 @@
 
 - User submits query → EventBridge triggers agent pipeline → results in dashboard with React Flow
 - Hybrid: Next.js frontend + FastAPI backend + AWS events (EventBridge/SQS/Step Functions)
-- Data: Postgres + pgvector | Auth: Clerk | Observability: OpenTelemetry
+- Data: Postgres + pgvector | Auth: AWS Cognito | Observability: OpenTelemetry
 
 ## Current status
 

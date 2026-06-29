@@ -3,7 +3,7 @@
 set -euo pipefail
 
 ENDPOINT="${AWS_ENDPOINT_URL:-http://localhost:4566}"
-REGION="${AWS_REGION:-us-east-1}"
+REGION="${AWS_REGION:-eu-west-2}"
 PREFIX="${SQS_QUEUE_PREFIX:-eventforge}"
 MAX_RECEIVE_COUNT="${SQS_MAX_RECEIVE_COUNT:-3}"
 

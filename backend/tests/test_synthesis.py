@@ -84,7 +84,7 @@ async def _seed_job_with_notes(
 ) -> tuple[Job, JobStage, list[ResearchNote]]:
     suffix = uuid.uuid4().hex[:8]
     user = User(email=f"synthesis-{suffix}@example.com",
-                clerk_id=f"synthesis-user-{suffix}")
+                auth_subject_id=f"synthesis-user-{suffix}")
     db_session.add(user)
     await db_session.flush()
 

@@ -3,7 +3,7 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from eventforge.api.deps import get_db, get_settings
+from eventforge.api.deps import get_current_user, get_db, get_settings
 from eventforge.api.schemas.queries import (
     QueryDetailResponse,
     QuerySummaryResponse,
@@ -11,13 +11,15 @@ from eventforge.api.schemas.queries import (
     SubmitQueryResponse,
 )
 from eventforge.core.config import Settings
+from eventforge.db.models import User
 from eventforge.events.publisher import EventPublisher, EventPublishError
 from eventforge.services.query import get_query_detail, list_queries, submit_query
 
 router = APIRouter()
 
 
-def get_publisher(settings: Settings = Depends(get_settings)) -> EventPublisher:
+def get_publisher(
+        settings: Settings = Depends(get_settings)) -> EventPublisher:
     return EventPublisher(settings)
 
 
@@ -30,11 +32,13 @@ async def create_query(
     body: SubmitQueryRequest,
     db: AsyncSession = Depends(get_db),
     publisher: EventPublisher = Depends(get_publisher),
+    current_user: User = Depends(get_current_user),
 ) -> SubmitQueryResponse:
     try:
         result = await submit_query(
             db,
             publisher,
+            current_user,
             topic=body.topic,
             depth=body.depth,
             max_sources=body.max_sources,
@@ -43,10 +47,11 @@ async def create_query(
         await db.rollback()
         raise HTTPException(
             status_code=status.HTTP_502_BAD_GATEWAY,
-            detail={"message": "Failed to publish query.submitted event", "error": str(exc)},
-        ) from exc
+            detail={"message": "Failed to publish query.submitted event",
+                    "error": str(exc)},) from exc
 
-    return SubmitQueryResponse(job_id=result.job_id, correlation_id=result.correlation_id)
+    return SubmitQueryResponse(
+        job_id=result.job_id, correlation_id=result.correlation_id)
 
 
 @router.get(
@@ -55,8 +60,9 @@ async def create_query(
 )
 async def list_user_queries(
     db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ) -> list[QuerySummaryResponse]:
-    return await list_queries(db)
+    return await list_queries(db, current_user)
 
 
 @router.get(
@@ -66,8 +72,10 @@ async def list_user_queries(
 async def get_query(
     job_id: UUID,
     db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ) -> QueryDetailResponse:
-    detail = await get_query_detail(db, job_id)
+    detail = await get_query_detail(db, job_id, current_user)
     if detail is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Job not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Job not found")
     return detail

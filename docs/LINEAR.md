@@ -13,11 +13,11 @@
 
 ## Latest progress (2026-06-23)
 
-**[Project status update](https://linear.app/kreativbiro/project/eventforge-f35070f0931e/activity)** — Phase 3 agents complete; auth is the exit gate.
+**[Project status update](https://linear.app/kreativbiro/project/eventforge-f35070f0931e/activity)** — Phase 3 agents complete; Cognito auth (KRE-146) is the exit gate.
 
 | Done (Phase 3) | Next |
 | --- | --- |
-| KRE-139 LLM client + `llm_usage` | **KRE-146** Clerk JWT auth + user-scoped queries |
+| KRE-139 LLM client + `llm_usage` | **KRE-146** Cognito JWT auth + user-scoped queries |
 | KRE-140 Tavily ingestion | Phase 4 frontend (KRE-119+) |
 | KRE-141 real embeddings | KRE-150 quality pass (optional) |
 | KRE-143 RAG + entity extraction | |
@@ -50,7 +50,7 @@ save_issue(id: "KRE-122", state: "Done")
 | Phase 0 — Foundation    | Complete                             |
 | Phase 1 — Scaffolding   | Backend complete; frontend → Phase 4 |
 | Phase 2 — Core Pipeline | Complete (stub agents + E2E)         |
-| Phase 3 — Real AI       | **In progress** — agents + resilience done; **KRE-146 auth** remaining |
+| Phase 3 — Real AI       | **In progress** — agents + resilience done; **KRE-146 Cognito auth** remaining |
 | Phase 4 — Frontend      | Deferred (after Phase 3)             |
 
 ## Issue index (Phase 0 + 1)
@@ -103,7 +103,7 @@ save_issue(id: "KRE-122", state: "Done")
 | EF-027 | [KRE-142](https://linear.app/kreativbiro/issue/KRE-142) | Research — LLM parallel sub-queries               | 3        | KRE-143    |
 | EF-028 | [KRE-144](https://linear.app/kreativbiro/issue/KRE-144) | Synthesis — cited report generation               | 3        | KRE-142    |
 | EF-029 | [KRE-145](https://linear.app/kreativbiro/issue/KRE-145) | LLM cost tracking API endpoint                    | 2        | KRE-139    |
-| EF-030 | [KRE-146](https://linear.app/kreativbiro/issue/KRE-146) | Backend Clerk JWT auth + user-scoped queries      | 3        | —          |
+| EF-030 | [KRE-146](https://linear.app/kreativbiro/issue/KRE-146) | Backend Cognito JWT auth + user-scoped queries    | 3        | —          |
 | EF-031 | [KRE-147](https://linear.app/kreativbiro/issue/KRE-147) | LLM resilience — retry, circuit breaker, cost cap | 3        | KRE-139    |
 
 ## Issue index (Post-Phase 3 — revisit after cited synthesis E2E)
@@ -125,7 +125,7 @@ Also see deferred infra/reliability: KRE-136 (outbox), KRE-137, KRE-138.
 Done:   KRE-118 → KRE-120 → KRE-123 → KRE-125 → KRE-122 → KRE-129 → KRE-130 → KRE-131 → KRE-132
         + all stub workers + E2E smoke test + KRE-134 (DLQ redrive) + KRE-135 (pipeline.failed)
 
-Next:   KRE-146 (Clerk auth)
+Next:   KRE-146 (Cognito auth)
 
 Done:   KRE-139 (LLM client + cost tracking foundation)
         KRE-140 (Tavily web search ingestion)
@@ -136,7 +136,7 @@ Done:   KRE-139 (LLM client + cost tracking foundation)
         KRE-145 (LLM cost tracking API)
         KRE-147 (LLM resilience — retry, circuit breaker, cost cap)
 
-Defer:  Phase 4 frontend — KRE-119 → KRE-121 → KRE-124 → KRE-126 → KRE-128 (SSE, React Flow, Clerk UI)
+Defer:  Phase 4 frontend — KRE-119 → KRE-121 → KRE-124 → KRE-126 → KRE-128 (SSE, React Flow, Cognito UI)
 
 After Phase 3 exit (KRE-144): KRE-150 umbrella → KRE-148 chunking, KRE-149 richer ingestion, KRE-133 RAG eval (+ KRE-136/145/147/138)
 

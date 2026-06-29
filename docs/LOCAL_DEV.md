@@ -46,10 +46,10 @@ docker compose exec postgres pg_isready -U eventforge
 curl http://localhost:4566/_localstack/health
 
 # EventBridge bus (after init)
-aws --endpoint-url=http://localhost:4566 events list-event-buses --region us-east-1
+aws --endpoint-url=http://localhost:4566 events list-event-buses --region eu-west-2
 
 # SQS queues
-aws --endpoint-url=http://localhost:4566 sqs list-queues --region us-east-1
+aws --endpoint-url=http://localhost:4566 sqs list-queues --region eu-west-2
 ```
 
 Stop with `make down` or `docker compose down`.
@@ -68,11 +68,59 @@ Key local values (defaults work for Docker Compose):
 |----------|-------------|
 | `POSTGRES_HOST` | `localhost` (or `postgres` inside Docker network) |
 | `AWS_ENDPOINT_URL` | `http://localhost:4566` |
+| `AWS_REGION` | `eu-west-2` (London — prod default) |
 | `AWS_ACCESS_KEY_ID` | `test` |
 | `AWS_SECRET_ACCESS_KEY` | `test` |
 | `NEXT_PUBLIC_API_URL` | `http://localhost:8000` |
+| `AUTH_DISABLED` | `true` (default — mock user for E2E; LocalStack has no Cognito) |
+| `COGNITO_USER_POOL_ID` | Set when testing real JWTs against a dev pool |
+| `COGNITO_APP_CLIENT_ID` | App client ID from the same user pool |
 
 When running backend **inside** docker-compose, use service names (`postgres`, `localstack`) as hosts. When running **natively** on your machine, use `localhost`.
+
+---
+
+## Authentication (Cognito)
+
+LocalStack does **not** emulate Cognito. Two supported paths:
+
+### Path 1 — Auth disabled (default, E2E scripts)
+
+```bash
+# .env
+AUTH_DISABLED=true
+```
+
+`POST/GET /api/v1/queries` use a shared mock user (`mock-local-user`). No Bearer token required.
+
+```bash
+./scripts/verify-pipeline-e2e.sh
+```
+
+### Path 2 — Real dev Cognito user pool
+
+1. Create a **Cognito User Pool** + app client in AWS (London: `eu-west-2`).
+2. Enable email sign-in; note **User pool ID** and **App client ID** (no secret for public SPA/client).
+3. Create a test user and sign in via Hosted UI or AWS CLI to obtain an **ID token**.
+4. Configure backend:
+
+```bash
+AUTH_DISABLED=false
+COGNITO_USER_POOL_ID=eu-west-2_XXXXXXXXX
+COGNITO_REGION=eu-west-2
+COGNITO_APP_CLIENT_ID=your-app-client-id
+```
+
+5. Call the API with the ID token:
+
+```bash
+curl -s -X POST "http://localhost:8000/api/v1/queries" \
+  -H "Authorization: Bearer ${COGNITO_ID_TOKEN}" \
+  -H "Content-Type: application/json" \
+  -d '{"topic":"Cognito auth test","depth":"standard"}'
+```
+
+Terraform for the user pool lands in **Phase 5** (`modules/cognito`). Phase 4 adds Hosted UI / Amplify in Next.js.
 
 ---
 

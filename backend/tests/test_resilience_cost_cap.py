@@ -33,7 +33,7 @@ async def db_session() -> AsyncSession:
 
 
 async def _seed_job(db_session: AsyncSession) -> Job:
-    user = User(email="cost-cap@example.com", clerk_id="cost-cap-user")
+    user = User(email="cost-cap@example.com", auth_subject_id="cost-cap-user")
     db_session.add(user)
     await db_session.flush()
 

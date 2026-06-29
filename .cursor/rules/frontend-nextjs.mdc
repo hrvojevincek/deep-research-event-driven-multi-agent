@@ -48,4 +48,4 @@ Prefer SSE over WebSocket (ADR-010). `useJobStream(jobId)` hook connects to `/ap
 
 ## Auth (Phase 4)
 
-Clerk for sign-in. Pass JWT to API client. Protected routes via Clerk middleware.
+Cognito Hosted UI or Amplify Auth for sign-in. Pass ID token to API client (`Authorization: Bearer`). Protect routes via middleware or client-side session guard.

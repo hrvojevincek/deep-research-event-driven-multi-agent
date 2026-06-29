@@ -16,6 +16,7 @@ terraform/
     ├── sqs/
     ├── step-functions/
     ├── ecs/          # or lambda/
+    ├── cognito/
     └── observability/
 ```
 

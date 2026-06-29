@@ -61,7 +61,7 @@ async def db_session() -> AsyncSession:
 
 async def _seed_job(db_session: AsyncSession) -> tuple[Job, JobStage]:
     suffix = uuid.uuid4().hex[:8]
-    user = User(email=f"ingest-{suffix}@example.com", clerk_id=f"ingest-user-{suffix}")
+    user = User(email=f"ingest-{suffix}@example.com", auth_subject_id=f"ingest-user-{suffix}")
     db_session.add(user)
     await db_session.flush()
 
@@ -232,7 +232,7 @@ async def test_process_succeeds_when_api_already_claimed_event(db_session: Async
 
 async def test_process_query_submitted_uses_default_source_count(db_session: AsyncSession) -> None:
     suffix = uuid.uuid4().hex[:8]
-    user = User(email=f"default-{suffix}@example.com", clerk_id=f"default-user-{suffix}")
+    user = User(email=f"default-{suffix}@example.com", auth_subject_id=f"default-user-{suffix}")
     db_session.add(user)
     await db_session.flush()
 

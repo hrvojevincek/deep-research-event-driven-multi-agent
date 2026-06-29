@@ -13,12 +13,11 @@ from eventforge.api.schemas.queries import (
     QuerySummaryResponse,
     SynthesisReportResponse,
 )
-from eventforge.db.models import Job, JobStage, JobStageName, JobStatus, LLMUsage, StageStatus
+from eventforge.db.models import Job, JobStage, JobStageName, JobStatus, LLMUsage, StageStatus, User
 from eventforge.db.repositories import (
     JobRepository,
     LLMUsageRepository,
     ProcessedEventRepository,
-    UserRepository,
 )
 from eventforge.events.publisher import PUBLISHER_WORKER_NAME, EventPublisher
 from eventforge.events.schemas import QueryDepth, build_query_submitted_event
@@ -37,12 +36,12 @@ class SubmitQueryResult:
 async def submit_query(
     session: AsyncSession,
     publisher: EventPublisher,
+    user: User,
     *,
     topic: str,
     depth: QueryDepth = QueryDepth.STANDARD,
     max_sources: int | None = None,
 ) -> SubmitQueryResult:
-    user = await UserRepository(session).get_or_create_mock_user()
 
     job_id = uuid.uuid4()
     correlation_id = uuid.uuid4().hex
@@ -170,16 +169,18 @@ def _job_to_detail_response(
     )
 
 
-async def list_queries(session: AsyncSession) -> list[QuerySummaryResponse]:
-    user = await UserRepository(session).get_or_create_mock_user()
+async def list_queries(session: AsyncSession, user: User) -> list[QuerySummaryResponse]:
     jobs = await JobRepository(session).list_by_user_id(user.id)
     return [_job_to_summary_response(job) for job in jobs]
 
 
 async def get_query_detail(
-        session: AsyncSession, job_id: uuid.UUID) -> QueryDetailResponse | None:
+    session: AsyncSession,
+    job_id: uuid.UUID,
+    user: User,
+) -> QueryDetailResponse | None:
     job = await JobRepository(session).get_by_id(job_id)
-    if job is None:
+    if job is None or job.user_id != user.id:
         return None
 
     usage_repo = LLMUsageRepository(session)

@@ -20,12 +20,13 @@ Init script: `infra/docker/localstack/init/01-eventforge.sh` creates bus + queue
 ## Terraform (`infra/terraform/`)
 
 ```
-modules/{networking,rds,eventbridge,sqs,step-functions,ecs,observability}
+modules/{networking,rds,eventbridge,sqs,step-functions,ecs,cognito,observability}
 environments/{dev,prod}
 ```
 
 - Least-privilege IAM per worker (SQS consume, EB publish, S3 read/write)
 - Secrets in AWS Secrets Manager (not in tfvars)
+- **Default AWS region:** `eu-west-2` (London) for prod/dev environments
 - Phase 5 — don't scaffold AWS until pipeline works locally
 
 ## LocalStack limits

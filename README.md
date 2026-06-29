@@ -18,7 +18,7 @@ Turn open-ended research questions into **cited, multi-source syntheses** you ca
 
 **MVP done when:** A user submits a query → real agents run end-to-end → synthesis lands in the DB with citations → UI shows live pipeline progress and cost.
 
-**Backend MVP (Phase 3):** Real cited synthesis via API ✅ — Clerk auth is the remaining gate before Phase 3 exit.
+**Backend MVP (Phase 3):** Real cited synthesis + Cognito JWT auth ✅ — Phase 3 exit complete.
 
 ---
 
@@ -31,8 +31,8 @@ Turn open-ended research questions into **cited, multi-source syntheses** you ca
 | **0** | Docs, Docker, LocalStack, Postgres + pgvector                                 | ✅ Done                                                                 |
 | **1** | FastAPI backend, health checks, SQLAlchemy, Alembic                           | ✅ Done                                                                 |
 | **2** | Event pipeline with **stub agents** (ingestion → synthesis), DLQ, idempotency | ✅ Done                                                                 |
-| **3** | **Real AI** — full agent pipeline, cost API, resilience                       | 🚧 **Nearly done** — agents + resilience ✅; **KRE-146 auth** remaining |
-| **4** | Next.js UI, SSE live updates, React Flow visualization, Clerk                 | Planned                                                                 |
+| **3** | **Real AI** — full agent pipeline, cost API, resilience, Cognito auth          | ✅ **Complete**                                                         |
+| **4** | Next.js UI, SSE live updates, React Flow visualization, Cognito              | **Next**                                                                |
 | **5** | AWS deploy (Terraform, ECS, Step Functions fan-out)                           | Planned                                                                 |
 | **6** | Polish — demo GIF, E2E tests, RAG eval, cost dashboard                        | Planned                                                                 |
 
@@ -63,7 +63,7 @@ POST /api/v1/queries  →  EventBridge  →  SQS workers  →  Postgres  →  GE
 | Real LLM research notes + cited synthesis                       | ✅ [KRE-142](https://linear.app/kreativbiro/issue/KRE-142) / ✅ [KRE-144](https://linear.app/kreativbiro/issue/KRE-144) |
 | LLM cost summary on `GET /api/v1/queries/{id}`                  | ✅ [KRE-145](https://linear.app/kreativbiro/issue/KRE-145)                                                              |
 | LLM resilience (retry, circuit breaker, per-job cost cap)       | ✅ [KRE-147](https://linear.app/kreativbiro/issue/KRE-147)                                                              |
-| Backend JWT auth (Clerk)                                        | ⬜ [KRE-146](https://linear.app/kreativbiro/issue/KRE-146) — mock user for local dev                                    |
+| Backend JWT auth (Cognito)                                      | ✅ [KRE-146](https://linear.app/kreativbiro/issue/KRE-146) — `AUTH_DISABLED=true` for local E2E                       |
 | Dashboard / React Flow                                          | ⬜ Phase 4                                                                                                              |
 
 **Smoke test:** `./scripts/verify-pipeline-e2e.sh` or `make verify-e2e` (API + all workers; real LLM run ~2–3 min with one research worker)
@@ -110,7 +110,7 @@ Full diagrams: [`docs/ARCHITECTURE.md`](./docs/ARCHITECTURE.md)
 | **LLM**                  | OpenAI + Anthropic client; Tavily search; OpenAI embeddings; RAG; cited synthesis       |
 | **Resilience**           | Exponential backoff retries, per-provider circuit breakers, optional `JOB_MAX_COST_USD` |
 | **Frontend** _(Phase 4)_ | Next.js 15, Tailwind, shadcn/ui, React Flow                                             |
-| **Auth** _(Phase 3–4)_   | Clerk JWT → FastAPI (backend: KRE-146 pending; local uses mock user)                    |
+| **Auth** _(Phase 3–4)_   | Cognito JWT → FastAPI (backend: KRE-146 pending; local uses mock when `AUTH_DISABLED`)  |
 | **IaC** _(Phase 5)_      | Terraform                                                                               |
 | **Local**                | Docker Compose + LocalStack                                                             |
 

@@ -58,7 +58,7 @@ A decoupled agent pipeline orchestrated by cloud events, with a polished dashboa
 
 | ID | Story | Priority |
 |----|-------|----------|
-| US-C1 | As a user, I can sign in (Clerk) to persist my query history. | P1 |
+| US-C1 | As a user, I can sign in (Cognito) to persist my query history. | P1 |
 | US-C2 | As a user, I can only see my own queries and results. | P1 |
 
 ### Epic D — Observability
@@ -157,7 +157,7 @@ flowchart LR
 
 ### MVP (Phases 0–4)
 
-- Single-user auth (Clerk)
+- Single-user auth (AWS Cognito)
 - Web search ingestion (Tavily or SerpAPI)
 - Postgres + pgvector for embeddings and metadata
 - 3–5 parallel research agents
@@ -196,7 +196,7 @@ flowchart LR
 | # | Question | Default Assumption |
 |---|----------|-------------------|
 | 1 | Web search provider? | Tavily API (research-focused) |
-| 2 | Auth provider? | Clerk |
+| 2 | Auth provider? | AWS Cognito |
 | 3 | Step Functions vs pure SQS chaining? | Step Functions for fan-out; SQS for stage workers |
 | 4 | Real-time transport? | SSE (simpler); WebSocket if bidirectional needed |
 | 5 | Project name final? | EventForge (repo: event-driven) |

@@ -109,7 +109,7 @@ async def _seed_job_with_entities(
     with_chunks: bool = False,
 ) -> tuple[Job, JobStage, list[KnowledgeEntity]]:
     suffix = uuid.uuid4().hex[:8]
-    user = User(email=f"research-{suffix}@example.com", clerk_id=f"research-user-{suffix}")
+    user = User(email=f"research-{suffix}@example.com", auth_subject_id=f"research-user-{suffix}")
     db_session.add(user)
     await db_session.flush()
 

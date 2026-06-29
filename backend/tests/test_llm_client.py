@@ -38,7 +38,7 @@ def llm_settings() -> Settings:
 
 @pytest.mark.asyncio
 async def test_llm_usage_repository_log_and_total(db_session: AsyncSession) -> None:
-    user = User(email="llm-cost@example.com", clerk_id="llm-cost-user")
+    user = User(email="llm-cost@example.com", auth_subject_id="llm-cost-user")
     db_session.add(user)
     await db_session.flush()
 
@@ -86,7 +86,7 @@ async def test_llm_client_logs_usage_when_session_bound(
     db_session: AsyncSession,
     llm_settings: Settings,
 ) -> None:
-    user = User(email="llm-client@example.com", clerk_id="llm-client-user")
+    user = User(email="llm-client@example.com", auth_subject_id="llm-client-user")
     db_session.add(user)
     await db_session.flush()
 

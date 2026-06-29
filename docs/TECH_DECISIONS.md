@@ -127,29 +127,36 @@ Need relational metadata (users, jobs, costs) and vector similarity search for R
 
 ---
 
-## ADR-004: Clerk for Authentication
+## ADR-004: AWS Cognito for Authentication
 
-**Status:** Accepted (MVP)  
-**Date:** 2025-06-20
+**Status:** Accepted (supersedes Clerk)  
+**Date:** 2025-06-20 · **Revised:** 2026-06-29
 
 ### Context
 
-Need auth without building identity from scratch. FastAPI validates JWTs.
+Need auth without building identity from scratch. FastAPI validates JWTs. Production deploys to AWS (EventBridge, SQS, ECS, RDS) — Cognito keeps identity in the same cloud footprint as the rest of the stack.
 
 ### Decision
 
-Use **Clerk** for frontend auth; FastAPI validates Clerk JWT via JWKS.
+Use **AWS Cognito User Pools** for authentication; FastAPI validates Cognito JWT (ID token) via JWKS. Next.js uses Cognito Hosted UI or Amplify Auth in Phase 4; Terraform `modules/cognito` in Phase 5.
 
 ### Rationale
 
-- Fastest path to secure, polished auth UI
-- Good Next.js integration
-- JWT standard works with FastAPI dependency injection
+- Aligns with AWS-native portfolio story (same region as RDS, no third-party auth vendor)
+- JWT + JWKS works with FastAPI dependency injection (same pattern as hosted auth SaaS)
+- Predictable cost at scale (~50k MAU free tier on user pools)
+- Terraform module fits Phase 5 IaC alongside EventBridge, SQS, ECS
+
+### Local dev
+
+- **`AUTH_DISABLED=true`:** mock user for E2E scripts (LocalStack has no Cognito)
+- **Dev user pool:** optional real AWS Cognito pool for Postman/curl token testing
 
 ### Alternatives
 
-- **Auth0** — viable, slightly heavier
-- **NextAuth + custom** — more code, less portfolio cloud signal
+- **Clerk** — faster UI polish and local dev; rejected for prod AWS alignment
+- **Better Auth** — self-hosted in Postgres; rejected; auth server would live in Next.js before backend-first Phase 3 exit
+- **Auth0** — viable hosted option; heavier than Cognito given existing AWS commitment
 - **Supabase Auth** — good if we used Supabase DB; we're on RDS
 
 ---
@@ -184,7 +191,7 @@ Instrument all services with **OpenTelemetry** SDK; export via OTLP to collector
 
 ### Decision
 
-Use **Terraform** with modular structure (`infra/terraform/modules/`).
+Use **Terraform** with modular structure (`infra/terraform/modules/`). Default AWS region: **`eu-west-2` (London)** for dev and prod environments.
 
 ### Rationale
 
@@ -323,7 +330,7 @@ Log every LLM call to `llm_usage` table: `job_id`, `agent_name`, `model`, `input
 | 001 | Hybrid Next.js + FastAPI | Accepted |
 | 002 | EventBridge + SQS + Step Functions | Accepted |
 | 003 | Postgres + pgvector | Accepted |
-| 004 | Clerk Auth | Accepted |
+| 004 | AWS Cognito Auth | Accepted |
 | 005 | OpenTelemetry | Accepted |
 | 006 | Terraform IaC | Accepted |
 | 007 | Docker Compose Local Dev | Accepted |

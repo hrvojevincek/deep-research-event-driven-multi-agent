@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_asyn
 from eventforge.core.config import get_settings
 from eventforge.db.models import Job, JobStatus, ProcessedEvent, User
 from eventforge.db.repositories import JobRepository, ProcessedEventRepository, UserRepository
-from eventforge.db.repositories.user import MOCK_CLERK_ID
+from eventforge.db.repositories.user import MOCK_AUTH_SUBJECT_ID
 from eventforge.db.session import reset_engine
 
 settings = get_settings()
@@ -28,7 +28,7 @@ async def test_user_and_job_repositories(db_session: AsyncSession) -> None:
     user_repo = UserRepository(db_session)
     job_repo = JobRepository(db_session)
 
-    user = User(email="test@example.com", clerk_id="user_test")
+    user = User(email="test@example.com", auth_subject_id="user_test")
     db_session.add(user)
     await db_session.flush()
 
@@ -42,7 +42,7 @@ async def test_user_and_job_repositories(db_session: AsyncSession) -> None:
     db_session.add(job)
     await db_session.flush()
 
-    fetched_user = await user_repo.get_by_clerk_id("user_test")
+    fetched_user = await user_repo.get_by_auth_subject_id("user_test")
     assert fetched_user is not None
     assert fetched_user.id == user.id
 
@@ -80,7 +80,7 @@ async def test_get_or_create_mock_user_is_idempotent(
     second = await repo.get_or_create_mock_user()
 
     assert first.id == second.id
-    assert first.clerk_id == MOCK_CLERK_ID
-    fetched = await repo.get_by_clerk_id(MOCK_CLERK_ID)
+    assert first.auth_subject_id == MOCK_AUTH_SUBJECT_ID
+    fetched = await repo.get_by_auth_subject_id(MOCK_AUTH_SUBJECT_ID)
     assert fetched is not None
     assert fetched.id == first.id

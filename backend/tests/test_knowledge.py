@@ -88,7 +88,7 @@ async def _seed_job_with_chunks(
     db_session: AsyncSession,
 ) -> tuple[Job, JobStage, list[DocumentChunk]]:
     suffix = uuid.uuid4().hex[:8]
-    user = User(email=f"knowledge-{suffix}@example.com", clerk_id=f"knowledge-user-{suffix}")
+    user = User(email=f"knowledge-{suffix}@example.com", auth_subject_id=f"knowledge-user-{suffix}")
     db_session.add(user)
     await db_session.flush()
 

@@ -269,7 +269,7 @@ On terminal failure:
 
 | Layer | Approach |
 |-------|----------|
-| Auth | Clerk JWT → FastAPI dependency validates on every request |
+| Auth | Cognito JWT → FastAPI dependency validates on every request |
 | API | Rate limiting per user (Redis or in-memory local) |
 | Data | `user_id` on all job rows; queries scoped in repository layer |
 | Secrets | AWS Secrets Manager in prod; `.env` local only |

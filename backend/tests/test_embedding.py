@@ -62,7 +62,7 @@ async def db_session() -> AsyncSession:
 
 async def _seed_job_with_sources(db_session: AsyncSession) -> tuple[Job, JobStage, list[Source]]:
     suffix = uuid.uuid4().hex[:8]
-    user = User(email=f"embed-{suffix}@example.com", clerk_id=f"embed-user-{suffix}")
+    user = User(email=f"embed-{suffix}@example.com", auth_subject_id=f"embed-user-{suffix}")
     db_session.add(user)
     await db_session.flush()
 

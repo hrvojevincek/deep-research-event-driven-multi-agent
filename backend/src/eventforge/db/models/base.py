@@ -41,13 +41,13 @@ class StageStatus(StrEnum):
 
 
 class User(Base):
-    """Authenticated user, linked to Clerk via clerk_id."""
+    """Authenticated user, linked to Cognito via auth_subject_id (JWT sub)."""
 
     __tablename__ = "users"
 
     id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    clerk_id: Mapped[str | None] = mapped_column(
+    auth_subject_id: Mapped[str | None] = mapped_column(
         String(255), unique=True, nullable=True)
     email: Mapped[str] = mapped_column(
         String(255), unique=True, nullable=False)
