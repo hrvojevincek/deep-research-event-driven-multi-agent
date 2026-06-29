@@ -1,0 +1,33 @@
+import type { Metadata } from "next";
+import { Geist_Mono, JetBrains_Mono } from "next/font/google";
+import "./globals.css";
+
+const geistMono = Geist_Mono({
+  variable: "--font-sans",
+  subsets: ["latin"],
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  variable: "--font-mono",
+  subsets: ["latin"],
+});
+
+export const metadata: Metadata = {
+  title: "EventForge",
+  description: "Event-driven multi-agent research platform",
+};
+
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  return (
+    <html
+      lang="en"
+      className={`${geistMono.variable} ${jetbrainsMono.variable} h-full antialiased`}
+    >
+      <body className="min-h-full flex flex-col">{children}</body>
+    </html>
+  );
+}

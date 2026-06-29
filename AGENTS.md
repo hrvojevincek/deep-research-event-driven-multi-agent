@@ -26,7 +26,7 @@
 
 ## Current status
 
-**Phase 2** complete (stub pipeline). **Next:** Phase 3 — real AI agents. Frontend deferred to Phase 4 ([KRE-119](https://linear.app/kreativbiro/issue/KRE-119)). Index: `docs/LINEAR.md`
+**Phase 3** complete (real AI + Cognito auth). **Next:** Phase 4 — frontend ([KRE-119](https://linear.app/kreativbiro/issue/KRE-119) onward). Index: `docs/LINEAR.md`
 
 ## Commands
 

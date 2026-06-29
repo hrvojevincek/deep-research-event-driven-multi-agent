@@ -63,7 +63,7 @@ POST /api/v1/queries  →  EventBridge  →  SQS workers  →  Postgres  →  GE
 | Real LLM research notes + cited synthesis                       | ✅ [KRE-142](https://linear.app/kreativbiro/issue/KRE-142) / ✅ [KRE-144](https://linear.app/kreativbiro/issue/KRE-144) |
 | LLM cost summary on `GET /api/v1/queries/{id}`                  | ✅ [KRE-145](https://linear.app/kreativbiro/issue/KRE-145)                                                              |
 | LLM resilience (retry, circuit breaker, per-job cost cap)       | ✅ [KRE-147](https://linear.app/kreativbiro/issue/KRE-147)                                                              |
-| Backend JWT auth (Cognito)                                      | ✅ [KRE-146](https://linear.app/kreativbiro/issue/KRE-146) — `AUTH_DISABLED=true` for local E2E                       |
+| Backend JWT auth (Cognito)                                      | ✅ [KRE-146](https://linear.app/kreativbiro/issue/KRE-146) — `AUTH_DISABLED=true` for E2E; real pool via `./scripts/get-cognito-token.sh` |
 | Dashboard / React Flow                                          | ⬜ Phase 4                                                                                                              |
 
 **Smoke test:** `./scripts/verify-pipeline-e2e.sh` or `make verify-e2e` (API + all workers; real LLM run ~2–3 min with one research worker)
@@ -110,7 +110,7 @@ Full diagrams: [`docs/ARCHITECTURE.md`](./docs/ARCHITECTURE.md)
 | **LLM**                  | OpenAI + Anthropic client; Tavily search; OpenAI embeddings; RAG; cited synthesis       |
 | **Resilience**           | Exponential backoff retries, per-provider circuit breakers, optional `JOB_MAX_COST_USD` |
 | **Frontend** _(Phase 4)_ | Next.js 15, Tailwind, shadcn/ui, React Flow                                             |
-| **Auth** _(Phase 3–4)_   | Cognito JWT → FastAPI (backend: KRE-146 pending; local uses mock when `AUTH_DISABLED`)  |
+| **Auth** _(Phase 3–4)_   | Cognito JWT → FastAPI ✅ (backend); Cognito Hosted UI in Next.js → Phase 4               |
 | **IaC** _(Phase 5)_      | Terraform                                                                               |
 | **Local**                | Docker Compose + LocalStack                                                             |
 
@@ -163,19 +163,28 @@ uv run --project backend python -m eventforge.workers.research
 uv run --project backend python -m eventforge.workers.synthesis
 ```
 
+**Local setup (3 terminals):** `make dev` · `make workers` · API calls below.
+
+**Regions:** `AWS_REGION=us-east-1` for LocalStack; `COGNITO_REGION=eu-west-2` for real Cognito pool.
+
 **Try the API:**
 
 ```bash
-# Health
+# Health (no auth)
 curl http://localhost:8000/health
 
-# Submit a query
+# E2E script path — set AUTH_DISABLED=true in .env
+./scripts/verify-pipeline-e2e.sh
+
+# Real Cognito auth — fetch ID token, then submit
+TOKEN=$(./scripts/get-cognito-token.sh)
 curl -X POST http://localhost:8000/api/v1/queries \
+  -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"topic": "Event-driven architecture patterns", "depth": "standard"}'
 
 # Poll job detail (use job_id from response) — includes stages, synthesis, llm_usage
-curl http://localhost:8000/api/v1/queries/{job_id}
+curl -H "Authorization: Bearer $TOKEN" http://localhost:8000/api/v1/queries/{job_id}
 ```
 
 OpenAPI docs: http://localhost:8000/docs

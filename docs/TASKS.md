@@ -136,7 +136,7 @@ When an issue closes → check the matching box below and ensure `KRE-xxx` link 
 - [x] Circuit breaker per provider — [KRE-147](https://linear.app/kreativbiro/issue/KRE-147)
 - [x] Per-query cost cap enforcement — [KRE-147](https://linear.app/kreativbiro/issue/KRE-147)
 
-**Phase 3 exit criteria:** Real research query via API produces cited synthesis; backend auth enforced; LLM costs tracked. Verified via Postman + `./scripts/verify-pipeline-e2e.sh`.
+**Phase 3 exit criteria:** ✅ Real research query via API produces cited synthesis; backend auth enforced; LLM costs tracked. Verified via Postman/curl (Cognito ID token) + `./scripts/verify-pipeline-e2e.sh` (`AUTH_DISABLED=true`).
 
 ---
 
