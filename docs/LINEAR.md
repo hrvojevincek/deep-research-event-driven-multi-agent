@@ -13,14 +13,15 @@
 
 ## Latest progress (2026-06-29)
 
-**Phase 4 frontend scaffold** — KRE-119, KRE-121, KRE-124, KRE-126 done.
+**Phase 4 scaffold complete** — KRE-119, KRE-121, KRE-124, KRE-126, KRE-128 done.
 
-| Done (Phase 4 scaffold) | Next (unblocked) |
+| Done (Phase 4 scaffold) | Next |
 | --- | --- |
-| KRE-119 Next.js + Tailwind + shadcn | **KRE-128** full-stack smoke test |
-| KRE-121 layout + placeholder pages | KRE-127 CI lint stub (if not done) |
-| KRE-124 API client + Dockerfile + compose | Phase 4.1–4.4: SSE, React Flow, dashboard UI, Cognito |
-| KRE-126 OpenAPI → TypeScript codegen | |
+| KRE-119 Next.js + Tailwind + shadcn | **Phase 4.1** SSE + `useJobStream` |
+| KRE-121 layout + placeholder pages | Phase 4.2 React Flow |
+| KRE-124 API client + Dockerfile + compose | Phase 4.3 dashboard UI + TanStack Query |
+| KRE-126 OpenAPI → TypeScript codegen | Phase 4.4 Cognito UI |
+| KRE-128 full-stack smoke test (`verify-fullstack.sh`) | |
 
 **Phase 3 complete** — real AI pipeline + Cognito JWT auth verified end-to-end.
 
@@ -133,8 +134,8 @@ Done:   KRE-139 (LLM client + cost tracking foundation)
         KRE-146 (Cognito JWT auth + user-scoped queries)
         KRE-147 (LLM resilience — retry, circuit breaker, cost cap)
 
-Next:   Phase 4 frontend — KRE-119 ✅ → KRE-121 ✅ → KRE-124 ✅ → KRE-126 ✅ → KRE-127 → KRE-128
-        Then Phase 4.1–4.4: SSE, React Flow, dashboard UI, Cognito Hosted UI
+Next:   Phase 4 product — 4.1 SSE → 4.2 React Flow → 4.3 dashboard UI → 4.4 Cognito
+        Scaffold done: KRE-119 ✅ KRE-121 ✅ KRE-124 ✅ KRE-126 ✅ KRE-128 ✅
 
 Optional: KRE-150 umbrella → KRE-148 chunking, KRE-149 richer ingestion, KRE-133 RAG eval (+ KRE-136/137/138)
 

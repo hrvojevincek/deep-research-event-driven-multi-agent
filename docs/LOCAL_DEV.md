@@ -143,6 +143,15 @@ make dev
 | Postgres    | localhost:5432             |
 | LocalStack  | localhost:4566             |
 
+**Verify full stack (KRE-128):**
+
+```bash
+make dev   # separate terminal, or: docker compose up -d --build
+make verify-fullstack
+```
+
+Checks `/health`, `/health/ready`, frontend HTML, and the same API URL the browser `api-client` uses.
+
 ### Option B: Hybrid (recommended for active development)
 
 Run infrastructure in Docker; run app code natively for hot-reload.

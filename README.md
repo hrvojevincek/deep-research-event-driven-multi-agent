@@ -72,6 +72,8 @@ POST /api/v1/queries  →  EventBridge  →  SQS workers  →  Postgres  →  GE
 
 **Smoke test:** `./scripts/verify-pipeline-e2e.sh` or `make verify-e2e` (API + all workers; real LLM run ~2–3 min with one research worker)
 
+**Full-stack scaffold:** `./scripts/verify-fullstack.sh` or `make verify-fullstack` (compose stack + frontend UI; no workers required)
+
 ---
 
 ## Architecture (at a glance)

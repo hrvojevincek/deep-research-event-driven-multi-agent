@@ -65,6 +65,8 @@ When an issue closes → check the matching box below and ensure `KRE-xxx` link 
 
 **Phase 1 exit criteria (backend):** `make dev` runs infra + backend; `/health` and `/health/ready` return 200; migrations apply cleanly.
 
+**Phase 4 scaffold exit (KRE-128):** `make dev` runs full stack including frontend; `./scripts/verify-fullstack.sh` passes.
+
 > **Backend-first:** Phase 2+ does not wait for frontend. Full-stack smoke test → [KRE-128](https://linear.app/kreativbiro/issue/KRE-128) moves to Phase 4.
 
 ---
@@ -156,7 +158,7 @@ When an issue closes → check the matching box below and ensure `KRE-xxx` link 
 - [x] `openapi-typescript` codegen from backend OpenAPI — KRE-126
 - [x] Dockerfile for frontend — KRE-124
 - [x] Uncomment frontend service in `docker-compose.yml` — KRE-124
-- [ ] Phase 4 full-stack integration smoke test — KRE-128
+- [x] Phase 4 full-stack integration smoke test — KRE-128
 
 ### 4.1 Real-Time Streaming
 
@@ -287,6 +289,6 @@ Project: EventForge
 
 ## Current Priority
 
-**Backend-first track:** Phase 2 complete. **Phase 3 complete**. **Phase 4 in progress** — KRE-119 + KRE-121 + KRE-124 + KRE-126 done; next [KRE-128](https://linear.app/kreativbiro/issue/KRE-128) (full-stack smoke test) or Phase 4.1 SSE.
+**Backend-first track:** Phase 2 complete. **Phase 3 complete**. **Phase 4 scaffold complete** (KRE-119–126, KRE-128); next Phase 4.1 SSE + React Flow.
 
 Verify: `./scripts/verify-pipeline-e2e.sh` · `./scripts/verify-dlq-redrive.sh` · run DLQ worker: `uv run --project backend python -m eventforge.workers.dlq`
