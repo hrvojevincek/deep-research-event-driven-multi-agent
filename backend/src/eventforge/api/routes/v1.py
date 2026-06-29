@@ -1,10 +1,11 @@
 from fastapi import APIRouter
 
-from eventforge.api.routes import queries
+from eventforge.api.routes import queries, stream
 
 router = APIRouter()
 
 router.include_router(queries.router)
+router.include_router(stream.router)
 
 
 @router.get("/")

@@ -391,9 +391,9 @@ make lint         # Run linters (Phase 1+)
 
 After infrastructure is verified:
 
-1. **Phase 1–2:** Backend API + stub pipeline (test via Postman)
-2. **Phase 3:** Real AI agents (Tavily, embeddings, LLM)
-3. **Phase 4:** Next.js frontend + SSE + React Flow
+1. **Phase 1–3:** Backend API + real AI pipeline ✅
+2. **Phase 4.1:** SSE live updates on `/queries/[id]` ✅ ([KRE-151](https://linear.app/kreativbiro/issue/KRE-151))
+3. **Phase 4.2:** React Flow pipeline visualization — next ([KRE-152](https://linear.app/kreativbiro/issue/KRE-152))
 4. See `docs/TASKS.md` for full roadmap
 
-Say: _"Implement Phase 3"_ to begin real AI agents.
+Say: _"Implement KRE-152"_ for React Flow.

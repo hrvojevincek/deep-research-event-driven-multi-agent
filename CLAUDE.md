@@ -45,7 +45,7 @@ Phase 1+: `uv run uvicorn eventforge.main:app --reload` | `npm run dev`
 
 ## Current phase
 
-**Phase 3** complete (real AI + Cognito auth). **Next:** Phase 4 — frontend ([KRE-119](https://linear.app/kreativbiro/issue/KRE-119)). Index: `docs/LINEAR.md`
+**Phase 3** complete (real AI + Cognito auth). **Phase 4.1** complete (SSE — [KRE-151](https://linear.app/kreativbiro/issue/KRE-151)). **Next:** Phase 4.2 React Flow ([KRE-152](https://linear.app/kreativbiro/issue/KRE-152)). Index: `docs/LINEAR.md`
 
 ## User shortcuts
 

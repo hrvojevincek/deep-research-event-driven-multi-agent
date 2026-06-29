@@ -37,6 +37,23 @@ class JobRepository(BaseRepository):
 
 class JobStageRepository(BaseRepository):
     """Track and update per-stage execution status on a job."""
+
+    async def _emit_stage_event(self, job_stage: JobStage) -> None:
+        from eventforge.services.stage_stream import publish_stage_event
+
+        job = await JobRepository(self.session).get_by_id(job_stage.job_id)
+        if job is None:
+            return
+        publish_stage_event(
+            job.id,
+            job.correlation_id,
+            stage=job_stage.stage,
+            status=job_stage.status,
+            job_status=job.status,
+            detail=job_stage.error_detail,
+            duration_ms=job_stage.duration_ms,
+        )
+
     async def get_by_job_and_stage(self, job_id: uuid.UUID, stage: str) -> JobStage | None:
         result = await self.session.execute(
             select(JobStage).where(JobStage.job_id == job_id, JobStage.stage == stage)
@@ -48,6 +65,7 @@ class JobStageRepository(BaseRepository):
         job_stage.status = StageStatus.RUNNING.value
         job_stage.started_at = now
         await self.session.flush()
+        await self._emit_stage_event(job_stage)
         return job_stage
 
     async def mark_completed(self, job_stage: JobStage) -> JobStage:
@@ -57,6 +75,7 @@ class JobStageRepository(BaseRepository):
         if job_stage.started_at is not None:
             job_stage.duration_ms = int((now - job_stage.started_at).total_seconds() * 1000)
         await self.session.flush()
+        await self._emit_stage_event(job_stage)
         return job_stage
 
     async def mark_failed(self, job_stage: JobStage, error_detail: str) -> JobStage:
@@ -67,4 +86,5 @@ class JobStageRepository(BaseRepository):
         if job_stage.started_at is not None:
             job_stage.duration_ms = int((now - job_stage.started_at).total_seconds() * 1000)
         await self.session.flush()
+        await self._emit_stage_event(job_stage)
         return job_stage

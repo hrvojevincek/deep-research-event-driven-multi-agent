@@ -107,6 +107,35 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/queries/{job_id}/stream:
+    get:
+      tags:
+      - api
+      summary: Stream Query Events
+      description: Stream pipeline stage updates for a job via Server-Sent Events.
+      operationId: stream_query_events_api_v1_queries__job_id__stream_get
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: job_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Job Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
   /api/v1/:
     get:
       tags:

@@ -24,17 +24,17 @@ Turn open-ended research questions into **cited, multi-source syntheses** you ca
 
 ## Where things stand
 
-**Strategy:** Backend MVP complete (Phase 3). **Phase 4 frontend** underway — scaffold through OpenAPI codegen done; React Flow + SSE next.
+**Strategy:** Backend MVP complete (Phase 3). **Phase 4 frontend** — scaffold + SSE done; **React Flow next** ([KRE-152](https://linear.app/kreativbiro/issue/KRE-152)).
 
-| Phase | Focus                                                                         | Status                                                                                                                                                                                           |
-| ----- | ----------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **0** | Docs, Docker, LocalStack, Postgres + pgvector                                 | ✅ Done                                                                                                                                                                                          |
-| **1** | FastAPI backend, health checks, SQLAlchemy, Alembic                           | ✅ Done                                                                                                                                                                                          |
-| **2** | Event pipeline with **stub agents** (ingestion → synthesis), DLQ, idempotency | ✅ Done                                                                                                                                                                                          |
-| **3** | **Real AI** — full agent pipeline, cost API, resilience, Cognito auth         | ✅ **Complete**                                                                                                                                                                                  |
-| **4** | Next.js UI, SSE live updates, React Flow visualization, Cognito               | **In progress** — KRE-119 · KRE-121 · KRE-124 · [KRE-126](https://linear.app/kreativbiro/issue/KRE-126) ✅ |
-| **5** | AWS deploy (Terraform, ECS, Step Functions fan-out)                           | Planned                                                                                                                                                                                          |
-| **6** | Polish — demo GIF, E2E tests, RAG eval, cost dashboard                        | Planned                                                                                                                                                                                          |
+| Phase | Focus                                                                         | Status                                                                                                           |
+| ----- | ----------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| **0** | Docs, Docker, LocalStack, Postgres + pgvector                                 | ✅ Done                                                                                                          |
+| **1** | FastAPI backend, health checks, SQLAlchemy, Alembic                           | ✅ Done                                                                                                          |
+| **2** | Event pipeline with **stub agents** (ingestion → synthesis), DLQ, idempotency | ✅ Done                                                                                                          |
+| **3** | **Real AI** — full agent pipeline, cost API, resilience, Cognito auth         | ✅ **Complete**                                                                                                  |
+| **4** | Next.js UI, SSE live updates, React Flow visualization, Cognito               | **In progress** — scaffold ✅ · [KRE-151](https://linear.app/kreativbiro/issue/KRE-151) SSE ✅ · next React Flow |
+| **5** | AWS deploy (Terraform, ECS, Step Functions fan-out)                           | Planned                                                                                                          |
+| **6** | Polish — demo GIF, E2E tests, RAG eval, cost dashboard                        | Planned                                                                                                          |
 
 Detail: [`docs/TASKS.md`](./docs/TASKS.md) · Linear: [`docs/LINEAR.md`](./docs/LINEAR.md)
 
@@ -67,8 +67,9 @@ POST /api/v1/queries  →  EventBridge  →  SQS workers  →  Postgres  →  GE
 | Next.js scaffold (App Router, Tailwind, shadcn/ui)                   | ✅ [KRE-119](https://linear.app/kreativbiro/issue/KRE-119)                                                                                |
 | App shell + placeholder pages (`/`, `/queries/new`, `/queries/[id]`) | ✅ [KRE-121](https://linear.app/kreativbiro/issue/KRE-121)                                                                                |
 | API client + Docker Compose frontend service                         | ✅ [KRE-124](https://linear.app/kreativbiro/issue/KRE-124)                                                                                |
-| OpenAPI codegen (`shared/openapi` → `src/types/api.ts`)         | ✅ [KRE-126](https://linear.app/kreativbiro/issue/KRE-126)                                                              |
-| Live React Flow dashboard + SSE                                 | ⬜ Phase 4.1+                                                                                                           |
+| Full-stack smoke test (`verify-fullstack.sh`)                        | ✅ [KRE-128](https://linear.app/kreativbiro/issue/KRE-128)                                                                                |
+| SSE live pipeline updates (`useJobStream` + `/queries/{id}/stream`)  | ✅ [KRE-151](https://linear.app/kreativbiro/issue/KRE-151)                                                                                |
+| Live React Flow dashboard                                            | ⬜ Phase 4.2 ([KRE-152](https://linear.app/kreativbiro/issue/KRE-152))                                                                    |
 
 **Smoke test:** `./scripts/verify-pipeline-e2e.sh` or `make verify-e2e` (API + all workers; real LLM run ~2–3 min with one research worker)
 
@@ -107,18 +108,18 @@ Full diagrams: [`docs/ARCHITECTURE.md`](./docs/ARCHITECTURE.md)
 
 ## Stack
 
-| Layer                    | Tech                                                                                                                             |
-| ------------------------ | -------------------------------------------------------------------------------------------------------------------------------- |
-| **API**                  | Python 3.12+, FastAPI, Pydantic v2, SQLAlchemy 2.0, uv                                                                           |
-| **Workers**              | Async SQS consumers, one module per pipeline stage                                                                               |
-| **Events**               | AWS EventBridge + SQS (+ Step Functions for research fan-out in prod)                                                            |
-| **Data**                 | Postgres 16 + pgvector                                                                                                           |
-| **LLM**                  | OpenAI + Anthropic client; Tavily search; OpenAI embeddings; RAG; cited synthesis                                                |
-| **Resilience**           | Exponential backoff retries, per-provider circuit breakers, optional `JOB_MAX_COST_USD`                                          |
-| **Frontend** _(Phase 4)_ | Next.js 16, shadcn/ui, fetch api-client, OpenAPI codegen ✅; React Flow + SSE next |
-| **Auth** _(Phase 3–4)_   | Cognito JWT → FastAPI ✅ (backend); Cognito Hosted UI in Next.js → Phase 4                                                       |
-| **IaC** _(Phase 5)_      | Terraform                                                                                                                        |
-| **Local**                | Docker Compose + LocalStack                                                                                                      |
+| Layer                    | Tech                                                                                                                      |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------- |
+| **API**                  | Python 3.12+, FastAPI, Pydantic v2, SQLAlchemy 2.0, uv                                                                    |
+| **Workers**              | Async SQS consumers, one module per pipeline stage                                                                        |
+| **Events**               | AWS EventBridge + SQS (+ Step Functions for research fan-out in prod)                                                     |
+| **Data**                 | Postgres 16 + pgvector                                                                                                    |
+| **LLM**                  | OpenAI + Anthropic client; Tavily search; OpenAI embeddings; RAG; cited synthesis                                         |
+| **Resilience**           | Exponential backoff retries, per-provider circuit breakers, optional `JOB_MAX_COST_USD`                                   |
+| **Frontend** _(Phase 4)_ | Next.js 16, shadcn/ui, OpenAPI codegen, SSE ✅ ([KRE-151](https://linear.app/kreativbiro/issue/KRE-151)); React Flow next |
+| **Auth** _(Phase 3–4)_   | Cognito JWT → FastAPI ✅ (backend); Cognito Hosted UI in Next.js → Phase 4                                                |
+| **IaC** _(Phase 5)_      | Terraform                                                                                                                 |
+| **Local**                | Docker Compose + LocalStack                                                                                               |
 
 ---
 
@@ -227,7 +228,8 @@ event-driven/
 └── frontend/                 # Next.js app (Phase 4)
     └── src/
         ├── app/              # /, /queries/new, /queries/[id]
-        ├── components/       # layout shell, shadcn/ui, health badge
+        ├── components/       # layout, dashboard (QueryDetailLive), shadcn/ui
+        ├── hooks/useJobStream.ts  # SSE subscription for live stage updates
         ├── lib/api-client.ts # fetch wrapper → NEXT_PUBLIC_API_URL
         └── types/api.ts      # generated from OpenAPI (npm run codegen)
 ```

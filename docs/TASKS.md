@@ -162,11 +162,15 @@ When an issue closes → check the matching box below and ensure `KRE-xxx` link 
 
 ### 4.1 Real-Time Streaming
 
-- [ ] SSE endpoint: `GET /api/v1/queries/{id}/stream`
-- [ ] Publish stage events to SSE subscribers
-- [ ] Frontend `useJobStream` hook
+→ [KRE-151](https://linear.app/kreativbiro/issue/KRE-151)
+
+- [x] SSE endpoint: `GET /api/v1/queries/{id}/stream`
+- [x] Publish stage events to SSE subscribers
+- [x] Frontend `useJobStream` hook
 
 ### 4.2 React Flow Visualization
+
+→ [KRE-152](https://linear.app/kreativbiro/issue/KRE-152)
 
 - [ ] Pipeline node components (pending, running, completed, failed)
 - [ ] Animated edges on active stage
@@ -289,6 +293,6 @@ Project: EventForge
 
 ## Current Priority
 
-**Backend-first track:** Phase 2 complete. **Phase 3 complete**. **Phase 4 scaffold complete** (KRE-119–126, KRE-128); next Phase 4.1 SSE + React Flow.
+**Backend-first track:** Phase 2–3 complete. **Phase 4.1 complete** (KRE-151 SSE); next **[KRE-152](https://linear.app/kreativbiro/issue/KRE-152)** React Flow.
 
 Verify: `./scripts/verify-pipeline-e2e.sh` · `./scripts/verify-dlq-redrive.sh` · run DLQ worker: `uv run --project backend python -m eventforge.workers.dlq`
