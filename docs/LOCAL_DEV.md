@@ -8,14 +8,14 @@ How to run EventForge locally using Docker Compose, LocalStack, and native dev s
 
 ## Prerequisites
 
-| Tool | Version | Purpose |
-|------|---------|---------|
-| Docker Desktop | 4.x+ | Containers for Postgres (pgvector), LocalStack |
-| Node.js | 20 LTS | Frontend dev server |
-| Python | 3.12+ | Backend dev server |
-| uv (recommended) | latest | Python package management |
-| AWS CLI | 2.x | Optional: inspect LocalStack resources |
-| Make | any | Convenience commands |
+| Tool             | Version | Purpose                                        |
+| ---------------- | ------- | ---------------------------------------------- |
+| Docker Desktop   | 4.x+    | Containers for Postgres (pgvector), LocalStack |
+| Node.js          | 20 LTS  | Frontend dev server                            |
+| Python           | 3.12+   | Backend dev server                             |
+| uv (recommended) | latest  | Python package management                      |
+| AWS CLI          | 2.x     | Optional: inspect LocalStack resources         |
+| Make             | any     | Convenience commands                           |
 
 ---
 
@@ -33,6 +33,7 @@ make dev
 ```
 
 This starts:
+
 - **Postgres** (with pgvector) on `localhost:5432`
 - **LocalStack** on `localhost:4566` (EventBridge, SQS, Step Functions, S3)
 
@@ -64,17 +65,17 @@ cp .env.example .env
 
 Key local values (defaults work for Docker Compose):
 
-| Variable | Local Value |
-|----------|-------------|
-| `POSTGRES_HOST` | `localhost` (or `postgres` inside Docker network) |
-| `AWS_ENDPOINT_URL` | `http://localhost:4566` |
-| `AWS_REGION` | `eu-west-2` (London — prod default) |
-| `AWS_ACCESS_KEY_ID` | `test` |
-| `AWS_SECRET_ACCESS_KEY` | `test` |
-| `NEXT_PUBLIC_API_URL` | `http://localhost:8000` |
-| `AUTH_DISABLED` | `true` (default — mock user for E2E; LocalStack has no Cognito) |
-| `COGNITO_USER_POOL_ID` | Set when testing real JWTs against a dev pool |
-| `COGNITO_APP_CLIENT_ID` | App client ID from the same user pool |
+| Variable                | Local Value                                                     |
+| ----------------------- | --------------------------------------------------------------- |
+| `POSTGRES_HOST`         | `localhost` (or `postgres` inside Docker network)               |
+| `AWS_ENDPOINT_URL`      | `http://localhost:4566`                                         |
+| `AWS_REGION`            | `eu-west-2` (London — prod default)                             |
+| `AWS_ACCESS_KEY_ID`     | `test`                                                          |
+| `AWS_SECRET_ACCESS_KEY` | `test`                                                          |
+| `NEXT_PUBLIC_API_URL`   | `http://localhost:8000`                                         |
+| `AUTH_DISABLED`         | `true` (default — mock user for E2E; LocalStack has no Cognito) |
+| `COGNITO_USER_POOL_ID`  | Set when testing real JWTs against a dev pool                   |
+| `COGNITO_APP_CLIENT_ID` | App client ID from the same user pool                           |
 
 When running backend **inside** docker-compose, use service names (`postgres`, `localstack`) as hosts. When running **natively** on your machine, use `localhost`.
 
@@ -134,15 +135,13 @@ Once backend and frontend are scaffolded:
 make dev
 ```
 
-Uncomment `backend` and `frontend` services in `docker-compose.yml` first.
-
-| Service | URL |
-|---------|-----|
-| Frontend | http://localhost:3000 |
-| Backend API | http://localhost:8000 |
-| API docs | http://localhost:8000/docs |
-| Postgres | localhost:5432 |
-| LocalStack | localhost:4566 |
+| Service     | URL                        |
+| ----------- | -------------------------- |
+| Frontend    | http://localhost:3000      |
+| Backend API | http://localhost:8000      |
+| API docs    | http://localhost:8000/docs |
+| Postgres    | localhost:5432             |
+| LocalStack  | localhost:4566             |
 
 ### Option B: Hybrid (recommended for active development)
 
@@ -199,12 +198,12 @@ awslocal sqs send-message \
 
 ### LocalStack Limitations
 
-| Feature | Local Support | Workaround |
-|---------|---------------|------------|
-| EventBridge → SQS rules | Good | Use init scripts |
-| SQS long-polling | Good | — |
-| Step Functions Map state | Limited | Simplified fan-out in local (see Phase 2) |
-| ECS / Fargate | Not emulated | Run workers as local Python processes |
+| Feature                  | Local Support | Workaround                                |
+| ------------------------ | ------------- | ----------------------------------------- |
+| EventBridge → SQS rules  | Good          | Use init scripts                          |
+| SQS long-polling         | Good          | —                                         |
+| Step Functions Map state | Limited       | Simplified fan-out in local (see Phase 2) |
+| ECS / Fargate            | Not emulated  | Run workers as local Python processes     |
 
 ---
 
@@ -258,6 +257,7 @@ open http://localhost:16686
 ```
 
 Set in `.env`:
+
 ```
 OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4317
 OTEL_SERVICE_NAME=eventforge-api
@@ -329,6 +329,7 @@ docker compose logs localstack | tail -50
 ```
 
 Ensure init script is executable:
+
 ```bash
 chmod +x infra/docker/localstack/init/01-eventforge.sh
 ```
@@ -384,6 +385,6 @@ After infrastructure is verified:
 1. **Phase 1–2:** Backend API + stub pipeline (test via Postman)
 2. **Phase 3:** Real AI agents (Tavily, embeddings, LLM)
 3. **Phase 4:** Next.js frontend + SSE + React Flow
-3. See `docs/TASKS.md` for full roadmap
+4. See `docs/TASKS.md` for full roadmap
 
-Say: *"Implement Phase 3"* to begin real AI agents.
+Say: _"Implement Phase 3"_ to begin real AI agents.

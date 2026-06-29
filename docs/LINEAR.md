@@ -9,25 +9,22 @@
 | ------- | ---------------------------------------------------------------------------- |
 | Team    | `Kreativbiro` (key: `KRE`)                                                   |
 | Project | [EventForge](https://linear.app/kreativbiro/project/eventforge-f35070f0931e) |
-| Target  | Phase 4 frontend (backend MVP complete)                                     |
+| Target  | Phase 4 frontend (backend MVP complete)                                      |
 
 ## Latest progress (2026-06-29)
 
-**Phase 3 complete** — real AI pipeline + Cognito JWT auth verified end-to-end (Postman/curl + `make workers`).
+**Phase 4 frontend scaffold** — KRE-119, KRE-121, KRE-124 done.
 
-| Done (Phase 3) | Next |
+| Done (Phase 4 scaffold) | Next (unblocked) |
 | --- | --- |
-| KRE-139 LLM client + `llm_usage` | **KRE-119** Next.js 15 + Tailwind + shadcn scaffold |
-| KRE-140 Tavily ingestion | KRE-121 layout + pages |
-| KRE-141 real embeddings | KRE-124 API client + Docker |
-| KRE-143 RAG + entity extraction | KRE-128 SSE + React Flow (Phase 4.3) |
-| KRE-142 LLM research sub-queries | Cognito Hosted UI in Next.js (Phase 4.4) |
-| KRE-144 cited synthesis | |
-| KRE-145 LLM cost on `GET /queries/{id}` | Optional: KRE-150 quality pass |
-| KRE-146 Cognito JWT auth + user-scoped queries | |
-| KRE-147 LLM resilience (retry, breaker, cost cap) | |
+| KRE-119 Next.js + Tailwind + shadcn | **KRE-126** OpenAPI → TypeScript codegen |
+| KRE-121 layout + placeholder pages | KRE-127 CI lint stub (parallel) |
+| KRE-124 API client + Dockerfile + compose | KRE-128 full-stack smoke test (after 126 + 127) |
+| | Phase 4.1–4.4: SSE, React Flow, dashboard UI, Cognito |
 
-Phases 0–3 complete. Full pipeline runs locally with real AI, cited synthesis, and authenticated API.
+**Phase 3 complete** — real AI pipeline + Cognito JWT auth verified end-to-end.
+
+Phases 0–3 complete. Full pipeline runs locally with real AI, cited synthesis, and authenticated API. Frontend at http://localhost:3000 with live API health badge.
 
 ## Agent workflow (Cursor + Linear MCP)
 
@@ -46,13 +43,13 @@ save_issue(id: "KRE-122", state: "Done")
 
 ## Milestones
 
-| Milestone               | Status                               |
-| ----------------------- | ------------------------------------ |
-| Phase 0 — Foundation    | Complete                             |
-| Phase 1 — Scaffolding   | Backend complete; frontend → Phase 4 |
-| Phase 2 — Core Pipeline | Complete (stub agents + E2E)         |
+| Milestone               | Status                                                               |
+| ----------------------- | -------------------------------------------------------------------- |
+| Phase 0 — Foundation    | Complete                                                             |
+| Phase 1 — Scaffolding   | Backend complete; frontend → Phase 4                                 |
+| Phase 2 — Core Pipeline | Complete (stub agents + E2E)                                         |
 | Phase 3 — Real AI       | **Complete** — KRE-139–147 (real agents + Cognito auth + resilience) |
-| Phase 4 — Frontend      | **Next** — KRE-119 onward            |
+| Phase 4 — Frontend      | **In progress** — KRE-119 ✅ KRE-121 ✅ KRE-124 ✅; next KRE-126 |
 
 ## Issue index (Phase 0 + 1)
 
@@ -136,7 +133,8 @@ Done:   KRE-139 (LLM client + cost tracking foundation)
         KRE-146 (Cognito JWT auth + user-scoped queries)
         KRE-147 (LLM resilience — retry, circuit breaker, cost cap)
 
-Next:   Phase 4 frontend — KRE-119 → KRE-121 → KRE-124 → KRE-126 → KRE-128 (SSE, React Flow, Cognito UI)
+Next:   Phase 4 frontend — KRE-119 ✅ → KRE-121 ✅ → KRE-124 ✅ → KRE-126 → KRE-127 → KRE-128
+        Then Phase 4.1–4.4: SSE, React Flow, dashboard UI, Cognito Hosted UI
 
 Optional: KRE-150 umbrella → KRE-148 chunking, KRE-149 richer ingestion, KRE-133 RAG eval (+ KRE-136/137/138)
 

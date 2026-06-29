@@ -24,17 +24,17 @@ Turn open-ended research questions into **cited, multi-source syntheses** you ca
 
 ## Where things stand
 
-**Strategy:** Backend-first. API + workers are testable via Postman/curl today; the Next.js dashboard comes after real AI agents work.
+**Strategy:** Backend MVP complete (Phase 3). **Phase 4 frontend** underway — scaffold, layout, API client, and Docker Compose are live; typed OpenAPI codegen and React Flow come next.
 
-| Phase | Focus                                                                         | Status                                                                  |
-| ----- | ----------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
-| **0** | Docs, Docker, LocalStack, Postgres + pgvector                                 | ✅ Done                                                                 |
-| **1** | FastAPI backend, health checks, SQLAlchemy, Alembic                           | ✅ Done                                                                 |
-| **2** | Event pipeline with **stub agents** (ingestion → synthesis), DLQ, idempotency | ✅ Done                                                                 |
-| **3** | **Real AI** — full agent pipeline, cost API, resilience, Cognito auth          | ✅ **Complete**                                                         |
-| **4** | Next.js UI, SSE live updates, React Flow visualization, Cognito              | **Next**                                                                |
-| **5** | AWS deploy (Terraform, ECS, Step Functions fan-out)                           | Planned                                                                 |
-| **6** | Polish — demo GIF, E2E tests, RAG eval, cost dashboard                        | Planned                                                                 |
+| Phase | Focus                                                                         | Status                                                                                                                                                                                           |
+| ----- | ----------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **0** | Docs, Docker, LocalStack, Postgres + pgvector                                 | ✅ Done                                                                                                                                                                                          |
+| **1** | FastAPI backend, health checks, SQLAlchemy, Alembic                           | ✅ Done                                                                                                                                                                                          |
+| **2** | Event pipeline with **stub agents** (ingestion → synthesis), DLQ, idempotency | ✅ Done                                                                                                                                                                                          |
+| **3** | **Real AI** — full agent pipeline, cost API, resilience, Cognito auth         | ✅ **Complete**                                                                                                                                                                                  |
+| **4** | Next.js UI, SSE live updates, React Flow visualization, Cognito               | **In progress** — [KRE-119](https://linear.app/kreativbiro/issue/KRE-119) · [KRE-121](https://linear.app/kreativbiro/issue/KRE-121) · [KRE-124](https://linear.app/kreativbiro/issue/KRE-124) ✅ |
+| **5** | AWS deploy (Terraform, ECS, Step Functions fan-out)                           | Planned                                                                                                                                                                                          |
+| **6** | Polish — demo GIF, E2E tests, RAG eval, cost dashboard                        | Planned                                                                                                                                                                                          |
 
 Detail: [`docs/TASKS.md`](./docs/TASKS.md) · Linear: [`docs/LINEAR.md`](./docs/LINEAR.md)
 
@@ -48,23 +48,26 @@ The **full event pipeline runs locally** with **real AI** end-to-end (ingestion 
 POST /api/v1/queries  →  EventBridge  →  SQS workers  →  Postgres  →  GET /api/v1/queries/{id}
 ```
 
-| Capability                                                      | Status                                                                                                                  |
-| --------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
-| Submit query, list jobs, job detail + stages                    | ✅ REST API                                                                                                             |
-| EventBridge → SQS → 5 stage workers + DLQ handler               | ✅ LocalStack                                                                                                           |
-| Idempotent processing (`processed_events`)                      | ✅                                                                                                                      |
-| SQS redrive → DLQ after 3 failures                              | ✅                                                                                                                      |
-| `pipeline.failed` terminal failure events                       | ✅                                                                                                                      |
-| LLM client (OpenAI + Anthropic, config-driven pricing)          | ✅ [KRE-139](https://linear.app/kreativbiro/issue/KRE-139)                                                              |
-| Per-call cost logging (`llm_usage` table)                       | ✅ [KRE-139](https://linear.app/kreativbiro/issue/KRE-139)                                                              |
-| Tavily web search ingestion                                     | ✅ [KRE-140](https://linear.app/kreativbiro/issue/KRE-140)                                                              |
-| Real chunking + OpenAI `text-embedding-3-small` → pgvector      | ✅ [KRE-141](https://linear.app/kreativbiro/issue/KRE-141)                                                              |
-| RAG knowledge mining (vector retrieval + LLM entity extraction) | ✅ [KRE-143](https://linear.app/kreativbiro/issue/KRE-143)                                                              |
-| Real LLM research notes + cited synthesis                       | ✅ [KRE-142](https://linear.app/kreativbiro/issue/KRE-142) / ✅ [KRE-144](https://linear.app/kreativbiro/issue/KRE-144) |
-| LLM cost summary on `GET /api/v1/queries/{id}`                  | ✅ [KRE-145](https://linear.app/kreativbiro/issue/KRE-145)                                                              |
-| LLM resilience (retry, circuit breaker, per-job cost cap)       | ✅ [KRE-147](https://linear.app/kreativbiro/issue/KRE-147)                                                              |
-| Backend JWT auth (Cognito)                                      | ✅ [KRE-146](https://linear.app/kreativbiro/issue/KRE-146) — `AUTH_DISABLED=true` for E2E; real pool via `./scripts/get-cognito-token.sh` |
-| Dashboard / React Flow                                          | ⬜ Phase 4                                                                                                              |
+| Capability                                                           | Status                                                                                                                                    |
+| -------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| Submit query, list jobs, job detail + stages                         | ✅ REST API                                                                                                                               |
+| EventBridge → SQS → 5 stage workers + DLQ handler                    | ✅ LocalStack                                                                                                                             |
+| Idempotent processing (`processed_events`)                           | ✅                                                                                                                                        |
+| SQS redrive → DLQ after 3 failures                                   | ✅                                                                                                                                        |
+| `pipeline.failed` terminal failure events                            | ✅                                                                                                                                        |
+| LLM client (OpenAI + Anthropic, config-driven pricing)               | ✅ [KRE-139](https://linear.app/kreativbiro/issue/KRE-139)                                                                                |
+| Per-call cost logging (`llm_usage` table)                            | ✅ [KRE-139](https://linear.app/kreativbiro/issue/KRE-139)                                                                                |
+| Tavily web search ingestion                                          | ✅ [KRE-140](https://linear.app/kreativbiro/issue/KRE-140)                                                                                |
+| Real chunking + OpenAI `text-embedding-3-small` → pgvector           | ✅ [KRE-141](https://linear.app/kreativbiro/issue/KRE-141)                                                                                |
+| RAG knowledge mining (vector retrieval + LLM entity extraction)      | ✅ [KRE-143](https://linear.app/kreativbiro/issue/KRE-143)                                                                                |
+| Real LLM research notes + cited synthesis                            | ✅ [KRE-142](https://linear.app/kreativbiro/issue/KRE-142) / ✅ [KRE-144](https://linear.app/kreativbiro/issue/KRE-144)                   |
+| LLM cost summary on `GET /api/v1/queries/{id}`                       | ✅ [KRE-145](https://linear.app/kreativbiro/issue/KRE-145)                                                                                |
+| LLM resilience (retry, circuit breaker, per-job cost cap)            | ✅ [KRE-147](https://linear.app/kreativbiro/issue/KRE-147)                                                                                |
+| Backend JWT auth (Cognito)                                           | ✅ [KRE-146](https://linear.app/kreativbiro/issue/KRE-146) — `AUTH_DISABLED=true` for E2E; real pool via `./scripts/get-cognito-token.sh` |
+| Next.js scaffold (App Router, Tailwind, shadcn/ui)                   | ✅ [KRE-119](https://linear.app/kreativbiro/issue/KRE-119)                                                                                |
+| App shell + placeholder pages (`/`, `/queries/new`, `/queries/[id]`) | ✅ [KRE-121](https://linear.app/kreativbiro/issue/KRE-121)                                                                                |
+| API client + Docker Compose frontend service                         | ✅ [KRE-124](https://linear.app/kreativbiro/issue/KRE-124)                                                                                |
+| OpenAPI codegen + live React Flow dashboard                          | ⬜ [KRE-126](https://linear.app/kreativbiro/issue/KRE-126) onward                                                                         |
 
 **Smoke test:** `./scripts/verify-pipeline-e2e.sh` or `make verify-e2e` (API + all workers; real LLM run ~2–3 min with one research worker)
 
@@ -101,18 +104,18 @@ Full diagrams: [`docs/ARCHITECTURE.md`](./docs/ARCHITECTURE.md)
 
 ## Stack
 
-| Layer                    | Tech                                                                                    |
-| ------------------------ | --------------------------------------------------------------------------------------- |
-| **API**                  | Python 3.12+, FastAPI, Pydantic v2, SQLAlchemy 2.0, uv                                  |
-| **Workers**              | Async SQS consumers, one module per pipeline stage                                      |
-| **Events**               | AWS EventBridge + SQS (+ Step Functions for research fan-out in prod)                   |
-| **Data**                 | Postgres 16 + pgvector                                                                  |
-| **LLM**                  | OpenAI + Anthropic client; Tavily search; OpenAI embeddings; RAG; cited synthesis       |
-| **Resilience**           | Exponential backoff retries, per-provider circuit breakers, optional `JOB_MAX_COST_USD` |
-| **Frontend** _(Phase 4)_ | Next.js 15, Tailwind, shadcn/ui, React Flow                                             |
-| **Auth** _(Phase 3–4)_   | Cognito JWT → FastAPI ✅ (backend); Cognito Hosted UI in Next.js → Phase 4               |
-| **IaC** _(Phase 5)_      | Terraform                                                                               |
-| **Local**                | Docker Compose + LocalStack                                                             |
+| Layer                    | Tech                                                                                                                             |
+| ------------------------ | -------------------------------------------------------------------------------------------------------------------------------- |
+| **API**                  | Python 3.12+, FastAPI, Pydantic v2, SQLAlchemy 2.0, uv                                                                           |
+| **Workers**              | Async SQS consumers, one module per pipeline stage                                                                               |
+| **Events**               | AWS EventBridge + SQS (+ Step Functions for research fan-out in prod)                                                            |
+| **Data**                 | Postgres 16 + pgvector                                                                                                           |
+| **LLM**                  | OpenAI + Anthropic client; Tavily search; OpenAI embeddings; RAG; cited synthesis                                                |
+| **Resilience**           | Exponential backoff retries, per-provider circuit breakers, optional `JOB_MAX_COST_USD`                                          |
+| **Frontend** _(Phase 4)_ | Next.js 16 App Router, Tailwind v4, shadcn/ui — scaffold + layout + fetch api-client ✅; OpenAPI codegen + React Flow + SSE next |
+| **Auth** _(Phase 3–4)_   | Cognito JWT → FastAPI ✅ (backend); Cognito Hosted UI in Next.js → Phase 4                                                       |
+| **IaC** _(Phase 5)_      | Terraform                                                                                                                        |
+| **Local**                | Docker Compose + LocalStack                                                                                                      |
 
 ---
 
@@ -123,10 +126,16 @@ Full diagrams: [`docs/ARCHITECTURE.md`](./docs/ARCHITECTURE.md)
 ```bash
 cp .env.example .env
 ./scripts/setup-local.sh    # first time
-make dev                    # Postgres + LocalStack + backend
+make dev                    # Postgres + LocalStack + backend + frontend
 
 cd backend && uv run alembic upgrade head   # migrations
 ```
+
+| Service  | URL                        |
+| -------- | -------------------------- |
+| Frontend | http://localhost:3000      |
+| Backend  | http://localhost:8000      |
+| API docs | http://localhost:8000/docs |
 
 **Phase 3 API keys** (in `.env` — required for real ingestion → synthesis path):
 
@@ -140,11 +149,12 @@ KNOWLEDGE_MAX_ENTITIES=4       # optional — caps research fan-out
 JOB_MAX_COST_USD=2.0           # optional — per-job LLM spend cap (omit to disable)
 ```
 
-**Hybrid (hot reload):** run infra in Docker, API natively:
+**Hybrid (hot reload):** run infra in Docker, API + frontend natively:
 
 ```bash
 docker compose up postgres localstack
 cd backend && uv sync && uv run uvicorn eventforge.main:app --reload --port 8000
+cd frontend && cp .env.example .env && npm install && npm run dev   # http://localhost:3000
 ```
 
 **Workers** (required for pipeline to complete):
@@ -163,7 +173,9 @@ uv run --project backend python -m eventforge.workers.research
 uv run --project backend python -m eventforge.workers.synthesis
 ```
 
-**Local setup (3 terminals):** `make dev` · `make workers` · API calls below.
+**Local setup (3 terminals for hybrid):** `make dev` (full stack) · or infra + `make workers` · API calls below.
+
+Header **API ok** badge on http://localhost:3000 confirms frontend → backend health via `lib/api-client.ts`.
 
 **Regions:** `AWS_REGION=us-east-1` for LocalStack; `COGNITO_REGION=eu-west-2` for real Cognito pool.
 
@@ -209,7 +221,11 @@ event-driven/
 ├── infra/                    # Terraform, LocalStack init, Docker
 ├── docs/                     # PRD, architecture, ADRs, roadmap
 ├── scripts/                  # setup, E2E verify, seed
-└── frontend/                 # Phase 4 — not scaffolded yet
+└── frontend/                 # Next.js app (Phase 4)
+    └── src/
+        ├── app/              # /, /queries/new, /queries/[id]
+        ├── components/       # layout shell, shadcn/ui, health badge
+        └── lib/api-client.ts # fetch wrapper → NEXT_PUBLIC_API_URL
 ```
 
 ---

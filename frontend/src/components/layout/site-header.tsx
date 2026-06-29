@@ -3,6 +3,7 @@
 import { Menu } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { BackendHealthBadge } from "@/components/layout/backend-health-badge";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
 
 type SiteHeaderProps = {
@@ -27,7 +28,8 @@ export function SiteHeader({ onMenuClick }: SiteHeaderProps) {
         </p>
       </div>
 
-      <div className="flex items-center gap-1">
+      <div className="flex items-center gap-2">
+        <BackendHealthBadge />
         <ThemeToggle />
         <Button variant="outline" size="sm" disabled>
           Sign in

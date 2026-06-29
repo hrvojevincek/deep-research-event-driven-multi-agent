@@ -148,14 +148,14 @@ When an issue closes → check the matching box below and ensure `KRE-xxx` link 
 
 → [KRE-119](https://linear.app/kreativbiro/issue/KRE-119) · [KRE-121](https://linear.app/kreativbiro/issue/KRE-121) · [KRE-124](https://linear.app/kreativbiro/issue/KRE-124) · [KRE-126](https://linear.app/kreativbiro/issue/KRE-126) · [KRE-128](https://linear.app/kreativbiro/issue/KRE-128)
 
-- [ ] Initialize Next.js 15 with TypeScript, Tailwind, App Router — KRE-119
-- [ ] Install and configure shadcn/ui — KRE-119
-- [ ] Basic layout: header, sidebar, main content area — KRE-121
-- [ ] Placeholder pages: `/` (home), `/queries/new`, `/queries/[id]` — KRE-121
-- [ ] API client setup with env-based `NEXT_PUBLIC_API_URL` — KRE-124
+- [x] Initialize Next.js 15 with TypeScript, Tailwind, App Router — KRE-119
+- [x] Install and configure shadcn/ui — KRE-119
+- [x] Basic layout: header, sidebar, main content area — KRE-121
+- [x] Placeholder pages: `/` (home), `/queries/new`, `/queries/[id]` — KRE-121
+- [x] API client setup with env-based `NEXT_PUBLIC_API_URL` — KRE-124
 - [ ] `openapi-typescript` codegen from backend OpenAPI — KRE-126
-- [ ] Dockerfile for frontend — KRE-124
-- [ ] Uncomment frontend service in `docker-compose.yml` — KRE-124
+- [x] Dockerfile for frontend — KRE-124
+- [x] Uncomment frontend service in `docker-compose.yml` — KRE-124
 - [ ] Phase 4 full-stack integration smoke test — KRE-128
 
 ### 4.1 Real-Time Streaming
@@ -287,6 +287,6 @@ Project: EventForge
 
 ## Current Priority
 
-**Backend-first track:** Phase 2 complete. **Phase 3 complete** — KRE-139–147 done including KRE-146 (Cognito JWT auth). **Next:** Phase 4 frontend ([KRE-119](https://linear.app/kreativbiro/issue/KRE-119) onward).
+**Backend-first track:** Phase 2 complete. **Phase 3 complete** — KRE-139–147 done including KRE-146 (Cognito JWT auth). **Phase 4 in progress** — KRE-119 + KRE-121 + KRE-124 done; next [KRE-126](https://linear.app/kreativbiro/issue/KRE-126) (OpenAPI codegen).
 
 Verify: `./scripts/verify-pipeline-e2e.sh` · `./scripts/verify-dlq-redrive.sh` · run DLQ worker: `uv run --project backend python -m eventforge.workers.dlq`
