@@ -61,11 +61,11 @@ module "ecs" {
 
   event_bus_arn                = var.event_bus_arn
   worker_queue_arns            = var.worker_queue_arns
-  postgres_host                = var.postgres_host
-  postgres_port                = var.postgres_port
-  postgres_db                  = var.postgres_db
-  postgres_user                = var.postgres_user
-  postgres_password_secret_arn = var.postgres_password_secret_arn
+  postgres_host                = module.rds.address
+  postgres_port                = module.rds.port
+  postgres_db                  = module.rds.database_name
+  postgres_user                = module.rds.master_username
+  postgres_password_secret_arn = module.rds.password_secret_arn
   openai_api_key_secret_arn    = var.openai_api_key_secret_arn
   anthropic_api_key_secret_arn = var.anthropic_api_key_secret_arn
   tavily_api_key_secret_arn    = var.tavily_api_key_secret_arn

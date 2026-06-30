@@ -7,8 +7,19 @@ output "private_subnet_ids" {
 }
 
 output "rds_security_group_id" {
-  description = "Attach to RDS when modules/rds is added."
+  description = "RDS security group (used by modules/rds)."
   value       = module.networking.rds_security_group_id
+}
+
+output "rds_address" {
+  description = "RDS hostname for POSTGRES_HOST."
+  value       = module.rds.address
+}
+
+output "rds_password_secret_arn" {
+  description = "Secrets Manager ARN for Postgres password."
+  value       = module.rds.password_secret_arn
+  sensitive   = true
 }
 
 output "alb_dns_name" {

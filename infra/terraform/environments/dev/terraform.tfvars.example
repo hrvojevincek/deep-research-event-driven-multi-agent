@@ -10,13 +10,12 @@ single_nat_gateway = true
 backend_image  = "REPLACE_AFTER_ECR_PUSH"
 frontend_image = "REPLACE_AFTER_ECR_PUSH"
 
-# From modules/rds (next PR):
-postgres_host = "REPLACE_RDS_ENDPOINT"
+# Postgres — provisioned by modules/rds (password in Secrets Manager automatically)
+# postgres_db / postgres_user defaults: eventforge
 
-# From Secrets Manager:
-postgres_password_secret_arn = "arn:aws:secretsmanager:eu-west-2:ACCOUNT:secret:eventforge/dev/postgres-password"
-openai_api_key_secret_arn    = "arn:aws:secretsmanager:eu-west-2:ACCOUNT:secret:eventforge/dev/openai-api-key"
-tavily_api_key_secret_arn    = "arn:aws:secretsmanager:eu-west-2:ACCOUNT:secret:eventforge/dev/tavily-api-key"
+# LLM / search API keys (create in Secrets Manager manually until secrets module):
+openai_api_key_secret_arn = "arn:aws:secretsmanager:eu-west-2:ACCOUNT:secret:eventforge/dev/openai-api-key"
+tavily_api_key_secret_arn = "arn:aws:secretsmanager:eu-west-2:ACCOUNT:secret:eventforge/dev/tavily-api-key"
 
 # From modules/eventbridge + modules/sqs (next PR):
 event_bus_arn = "arn:aws:events:eu-west-2:ACCOUNT:event-bus/eventforge-bus"
@@ -33,6 +32,9 @@ auth_disabled         = false
 
 # After ALB is created, set CORS to your app URL:
 # cors_origins = "[\"http://eventforge-dev-alb-123456789.eu-west-2.elb.amazonaws.com\"]"
+
+# Optional RDS sizing overrides:
+# rds_instance_class = "db.t4g.micro"
 
 # Optional TLS:
 # acm_certificate_arn = "arn:aws:acm:eu-west-2:ACCOUNT:certificate/..."

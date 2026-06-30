@@ -17,9 +17,10 @@
 
 | Done (Phase 5 — partial)                              | Next                        |
 | ----------------------------------------------------- | --------------------------- |
-| [KRE-156](https://linear.app/kreativbiro/issue/KRE-156) Terraform `modules/networking` | **RDS** `modules/rds`       |
-| [KRE-157](https://linear.app/kreativbiro/issue/KRE-157) Terraform `modules/ecs` + `environments/dev` | SQS + EventBridge + Cognito |
-| ADR-012 all-in-AWS ECS deployment decision            | Step Functions, CI/CD       |
+| [KRE-156](https://linear.app/kreativbiro/issue/KRE-156) Terraform `modules/networking` | SQS + EventBridge           |
+| [KRE-157](https://linear.app/kreativbiro/issue/KRE-157) Terraform `modules/ecs` + `environments/dev` | Cognito                     |
+| [KRE-158](https://linear.app/kreativbiro/issue/KRE-158) Terraform `modules/rds` — Postgres 16 + SM | Step Functions, CI/CD       |
+| ADR-012 all-in-AWS ECS deployment decision            |                             |
 
 **Phase 4 complete** — [KRE-155](https://linear.app/kreativbiro/issue/KRE-155) local OTEL (SDK, collector, Jaeger).
 
@@ -148,8 +149,9 @@ Also see deferred infra/reliability: KRE-136 (outbox), KRE-137, KRE-138.
 | ------ | ------------------------------------------------------- | ----------------------------------------------------- | -------- | ---------- |
 | EF-040 | [KRE-156](https://linear.app/kreativbiro/issue/KRE-156) | Terraform `modules/networking` — VPC, NAT, SG         | —        | —          |
 | EF-041 | [KRE-157](https://linear.app/kreativbiro/issue/KRE-157) | Terraform `modules/ecs` — ECR, ALB, Fargate services  | —        | KRE-156    |
+| EF-042 | [KRE-158](https://linear.app/kreativbiro/issue/KRE-158) | Terraform `modules/rds` — Postgres 16, backups, SM pwd | —        | KRE-156    |
 
-> **Next (not yet in Linear):** `modules/rds`, `modules/sqs`, `modules/eventbridge`, `modules/cognito`, Step Functions, CI/CD.
+> **Next (not yet in Linear):** `modules/sqs`, `modules/eventbridge`, `modules/cognito`, Step Functions, CI/CD.
 
 ## Backend-first track (recommended)
 
@@ -168,8 +170,8 @@ Done:   KRE-139 (LLM client + cost tracking foundation)
         KRE-147 (LLM resilience — retry, circuit breaker, cost cap)
 
 Next:   Phase 5 AWS deployment (in progress)
-        Done: KRE-156 ✅ networking · KRE-157 ✅ ecs + environments/dev
-        Next: modules/rds → sqs/eventbridge → cognito → step-functions → CI/CD
+        Done: KRE-156 ✅ networking · KRE-157 ✅ ecs · KRE-158 ✅ rds
+        Next: modules/sqs + eventbridge → cognito → step-functions → CI/CD
 
 Optional: KRE-150 umbrella → KRE-148 chunking, KRE-149 richer ingestion, KRE-133 RAG eval (+ KRE-136/137/138)
 

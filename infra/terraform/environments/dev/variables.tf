@@ -44,16 +44,6 @@ variable "worker_queue_arns" {
   default     = []
 }
 
-variable "postgres_host" {
-  description = "RDS endpoint (from modules/rds — wire when available)."
-  type        = string
-}
-
-variable "postgres_port" {
-  type    = number
-  default = 5432
-}
-
 variable "postgres_db" {
   type    = string
   default = "eventforge"
@@ -62,11 +52,6 @@ variable "postgres_db" {
 variable "postgres_user" {
   type    = string
   default = "eventforge"
-}
-
-variable "postgres_password_secret_arn" {
-  description = "Secrets Manager ARN for the Postgres password."
-  type        = string
 }
 
 variable "openai_api_key_secret_arn" {
