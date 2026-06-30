@@ -85,8 +85,8 @@ export function QueryDetailLive({ jobId }: QueryDetailLiveProps) {
         ) : null}
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
-        <Card className="min-h-80">
+      <div className="grid gap-6 lg:grid-cols-3 lg:items-start">
+        <Card className="h-fit lg:col-span-2">
           <CardHeader>
             <CardTitle>Pipeline</CardTitle>
             <CardDescription>
@@ -101,55 +101,53 @@ export function QueryDetailLive({ jobId }: QueryDetailLiveProps) {
           </CardContent>
         </Card>
 
-        <div className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Synthesis</CardTitle>
-              <CardDescription>
-                Markdown report with citations appears when the job completes.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <SynthesisViewer
-                detail={detailQuery.data}
-                jobStatus={displayStatus}
-                isLoading={detailQuery.isLoading}
-              />
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Sources</CardTitle>
-              <CardDescription>
-                Expandable snippets from ingested documents and web results.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <SourcesPanel
-                detail={detailQuery.data}
-                isLoading={detailQuery.isLoading}
-              />
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Cost</CardTitle>
-              <CardDescription>
-                Token usage and estimated spend from{" "}
-                <code className="font-mono text-xs">llm_usage</code>.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <CostPanel
-                detail={detailQuery.data}
-                isLoading={detailQuery.isLoading}
-              />
-            </CardContent>
-          </Card>
-        </div>
+        <Card className="h-fit">
+          <CardHeader>
+            <CardTitle>Cost</CardTitle>
+            <CardDescription>
+              Token usage and estimated spend from{" "}
+              <code className="font-mono text-xs">llm_usage</code>.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <CostPanel
+              detail={detailQuery.data}
+              isLoading={detailQuery.isLoading}
+            />
+          </CardContent>
+        </Card>
       </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Synthesis</CardTitle>
+          <CardDescription>
+            Markdown report with citations appears when the job completes.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <SynthesisViewer
+            detail={detailQuery.data}
+            jobStatus={displayStatus}
+            isLoading={detailQuery.isLoading}
+          />
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Sources</CardTitle>
+          <CardDescription>
+            Expandable snippets from ingested documents and web results.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <SourcesPanel
+            detail={detailQuery.data}
+            isLoading={detailQuery.isLoading}
+          />
+        </CardContent>
+      </Card>
     </div>
   );
 }

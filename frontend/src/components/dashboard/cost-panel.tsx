@@ -1,6 +1,5 @@
 "use client";
 
-import { Separator } from "@/components/ui/separator";
 import type { QueryDetail } from "@/lib/api-client";
 
 type CostPanelProps = {
@@ -32,7 +31,6 @@ export function CostPanel({ detail, isLoading }: CostPanelProps) {
 
   return (
     <>
-      <Separator className="mb-3" />
       <dl className="grid grid-cols-2 gap-3 text-sm">
         <div>
           <dt className="text-muted-foreground">Tokens</dt>
@@ -43,9 +41,7 @@ export function CostPanel({ detail, isLoading }: CostPanelProps) {
         <div>
           <dt className="text-muted-foreground">Est. cost</dt>
           <dd className="font-mono">
-            {isLoading && !detail
-              ? "…"
-              : formatUsd(usage?.total_cost_usd ?? 0)}
+            {isLoading && !detail ? "…" : formatUsd(usage?.total_cost_usd ?? 0)}
           </dd>
         </div>
       </dl>
