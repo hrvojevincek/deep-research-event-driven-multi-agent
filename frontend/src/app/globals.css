@@ -140,3 +140,9 @@
     @apply font-sans;
   }
 }
+
+/* React Flow — match EventForge theme tokens */
+.react-flow {
+  --xy-edge-stroke-default: var(--border);
+  --xy-node-background-color-default: var(--card);
+}

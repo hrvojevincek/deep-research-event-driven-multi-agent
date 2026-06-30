@@ -9,31 +9,12 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { PipelineGraph } from "@/components/workflow/pipeline-graph";
 import { useJobStream } from "@/hooks/useJobStream";
-import {
-  PIPELINE_STAGES,
-  type StageStatus,
-  stageLabel,
-} from "@/types/job-stream";
 
 type QueryDetailLiveProps = {
   jobId: string;
 };
-
-function statusVariant(
-  status: StageStatus | undefined,
-): "default" | "secondary" | "outline" | "destructive" {
-  switch (status) {
-    case "completed":
-      return "secondary";
-    case "running":
-      return "default";
-    case "failed":
-      return "destructive";
-    default:
-      return "outline";
-  }
-}
 
 function jobStatusLabel(status: string | null): string {
   if (!status) {
@@ -64,8 +45,8 @@ export function QueryDetailLive({ jobId }: QueryDetailLiveProps) {
           </Badge>
         </div>
         <p className="text-sm text-muted-foreground">
-          Pipeline stages update in real time via SSE. React Flow visualization
-          arrives in Phase 4.2.
+          Pipeline graph updates in real time via SSE. Click a stage for
+          details.
         </p>
         {stream.correlationId ? (
           <p className="font-mono text-xs text-muted-foreground">
@@ -89,52 +70,7 @@ export function QueryDetailLive({ jobId }: QueryDetailLiveProps) {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="flex flex-wrap items-center gap-2">
-              {PIPELINE_STAGES.map((stage, index) => {
-                const live = stream.stages[stage.id];
-                const status = (live?.status ?? "pending") as StageStatus;
-                return (
-                  <div key={stage.id} className="flex items-center gap-2">
-                    <Badge
-                      variant={statusVariant(status)}
-                      className="font-mono text-xs"
-                    >
-                      {stageLabel(stage.id)}
-                    </Badge>
-                    {index < PIPELINE_STAGES.length - 1 ? (
-                      <span className="text-muted-foreground">→</span>
-                    ) : null}
-                  </div>
-                );
-              })}
-            </div>
-
-            <div className="mt-6 space-y-2">
-              {PIPELINE_STAGES.map((stage) => {
-                const live = stream.stages[stage.id];
-                const status = live?.status ?? "pending";
-                return (
-                  <div
-                    key={`row-${stage.id}`}
-                    className="flex items-center justify-between rounded-md border border-border px-3 py-2 text-sm"
-                  >
-                    <span className="font-medium">{stageLabel(stage.id)}</span>
-                    <div className="flex items-center gap-3 font-mono text-xs text-muted-foreground">
-                      <span className="uppercase">{status}</span>
-                      {live?.duration_ms != null ? (
-                        <span>{live.duration_ms} ms</span>
-                      ) : null}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-
-            <div className="mt-8 flex h-48 items-center justify-center rounded-lg border border-dashed border-border bg-muted/30">
-              <p className="font-mono text-xs uppercase tracking-widest text-muted-foreground">
-                React Flow canvas (Phase 4.2)
-              </p>
-            </div>
+            <PipelineGraph stages={stream.stages} />
           </CardContent>
         </Card>
 

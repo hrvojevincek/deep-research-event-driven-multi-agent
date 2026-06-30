@@ -172,10 +172,10 @@ When an issue closes → check the matching box below and ensure `KRE-xxx` link 
 
 → [KRE-152](https://linear.app/kreativbiro/issue/KRE-152)
 
-- [ ] Pipeline node components (pending, running, completed, failed)
-- [ ] Animated edges on active stage
-- [ ] Auto-layout pipeline graph
-- [ ] Stage detail panel on node click (duration, agent name)
+- [x] Pipeline node components (pending, running, completed, failed)
+- [x] Animated edges on active stage
+- [x] Auto-layout pipeline graph
+- [x] Stage detail panel on node click (duration, agent name)
 
 ### 4.3 Dashboard UI
 
@@ -293,6 +293,6 @@ Project: EventForge
 
 ## Current Priority
 
-**Backend-first track:** Phase 2–3 complete. **Phase 4.1 complete** (KRE-151 SSE); next **[KRE-152](https://linear.app/kreativbiro/issue/KRE-152)** React Flow.
+**Backend-first track:** Phase 2–3 complete. **Phase 4.2 complete** (KRE-152 React Flow); next **Phase 4.3** dashboard UI.
 
 Verify: `./scripts/verify-pipeline-e2e.sh` · `./scripts/verify-dlq-redrive.sh` · run DLQ worker: `uv run --project backend python -m eventforge.workers.dlq`
