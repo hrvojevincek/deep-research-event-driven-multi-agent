@@ -14,6 +14,7 @@ from eventforge.api.schemas.queries import (
     SourceResponse,
     SynthesisReportResponse,
 )
+from eventforge.core.otel import agent_span
 from eventforge.db.models import Job, JobStage, JobStageName, JobStatus, LLMUsage, StageStatus, User
 from eventforge.db.repositories import (
     JobRepository,
@@ -82,7 +83,14 @@ async def submit_query(
     event_id = str(event.event_id)
 
     if await processed_repo.try_claim(event_id, PUBLISHER_WORKER_NAME):
-        await publisher.publish_query_submitted(event)
+        with agent_span(
+            "api",
+            "submit_query",
+            correlation_id=correlation_id,
+            job_id=str(job_id),
+            event_id=event_id,
+        ):
+            await publisher.publish_query_submitted(event)
     else:
         logger.info(
             "Skipped publish; query.submitted already claimed",

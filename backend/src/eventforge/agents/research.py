@@ -1,5 +1,6 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from eventforge.core.otel import traced_agent
 from eventforge.db.models import Job, JobStageName, KnowledgeEntity, ResearchNote
 from eventforge.db.repositories import (
     JobRepository,
@@ -108,6 +109,7 @@ async def _load_or_create_note(
     return note
 
 
+@traced_agent(WORKER_NAME_RESEARCH_ORCHESTRATOR)
 async def process_knowledge_mined(
     session: AsyncSession,
     publisher: EventPublisher,
@@ -160,6 +162,7 @@ async def process_knowledge_mined(
     return dispatched_events
 
 
+@traced_agent(WORKER_NAME_RESEARCH)
 async def process_research_task_dispatched(
     session: AsyncSession,
     publisher: EventPublisher,

@@ -66,6 +66,10 @@ class Settings(BaseSettings):
         default_factory=lambda: DEFAULT_MODEL_PRICING.copy()
     )
 
+    otel_enabled: bool = True
+    otel_exporter_otlp_endpoint: str = "http://localhost:4317"
+    otel_service_name: str = "eventforge-api"
+
     @field_validator(
         "llm_max_retries",
         "circuit_breaker_failure_threshold",

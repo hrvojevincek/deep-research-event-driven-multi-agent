@@ -1,5 +1,6 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from eventforge.core.otel import traced_agent
 from eventforge.db.models import Job, JobStageName, JobStatus, ResearchNote, SynthesisReport
 from eventforge.db.repositories import (
     JobRepository,
@@ -49,6 +50,7 @@ async def _load_or_create_report(
     return report
 
 
+@traced_agent(WORKER_NAME_SYNTHESIS)
 async def process_research_task_completed(
     session: AsyncSession,
     publisher: EventPublisher,

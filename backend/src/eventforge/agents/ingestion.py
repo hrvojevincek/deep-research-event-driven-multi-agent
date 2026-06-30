@@ -1,5 +1,6 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from eventforge.core.otel import traced_agent
 from eventforge.db.models import Job, JobStageName, JobStatus, Source, StageStatus
 from eventforge.db.repositories import (
     JobRepository,
@@ -61,6 +62,7 @@ async def _load_or_create_sources(
     return sources
 
 
+@traced_agent(WORKER_NAME_INGESTION)
 async def process_query_submitted(
     session: AsyncSession,
     publisher: EventPublisher,

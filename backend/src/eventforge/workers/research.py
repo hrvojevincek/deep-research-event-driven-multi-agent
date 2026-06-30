@@ -1,4 +1,3 @@
-import asyncio
 import logging
 from typing import Any
 
@@ -9,7 +8,6 @@ from eventforge.agents.research import (
     process_research_task_dispatched,
 )
 from eventforge.core.config import get_settings
-from eventforge.core.logging import setup_logging
 from eventforge.db.session import get_session_factory
 from eventforge.events.parser import parse_eventbridge_sqs_body
 from eventforge.events.publisher import EventPublisher
@@ -18,6 +16,7 @@ from eventforge.events.schemas.constants import (
     DETAIL_TYPE_RESEARCH_TASK_DISPATCHED,
 )
 from eventforge.workers.base import SqsConsumer
+from eventforge.workers.bootstrap import main
 from eventforge.workers.cost_cap import run_with_cost_cap_handling
 
 logger = logging.getLogger(__name__)
@@ -121,12 +120,5 @@ class ResearchWorker(SqsConsumer):
         )
 
 
-async def main() -> None:
-    settings = get_settings()
-    setup_logging(settings)
-    worker = ResearchWorker()
-    await worker.run_forever()
-
-
 if __name__ == "__main__":
-    asyncio.run(main())
+    main(ResearchWorker, service_suffix="research")

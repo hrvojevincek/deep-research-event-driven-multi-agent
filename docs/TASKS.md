@@ -195,9 +195,11 @@ When an issue closes → check the matching box below and ensure `KRE-xxx` link 
 
 ### 4.5 Observability (Local)
 
-- [ ] OTEL SDK in FastAPI + workers
-- [ ] OTEL collector in docker-compose
-- [ ] Verify traces in local Jaeger or Grafana
+→ [KRE-155](https://linear.app/kreativbiro/issue/KRE-155)
+
+- [x] OTEL SDK in FastAPI + workers
+- [x] OTEL collector in docker-compose
+- [x] Verify traces in local Jaeger or Grafana
 
 **Phase 4 exit criteria:** Submit query in UI → watch React Flow update live → view real synthesis result. → [KRE-128](https://linear.app/kreativbiro/issue/KRE-128)
 
@@ -297,6 +299,6 @@ Project: EventForge
 
 ## Current Priority
 
-**Backend-first track:** Phase 2–3 complete. **Phase 4.4 complete** (Cognito UI); next **Phase 4.5** OTEL local.
+**Backend-first track:** Phase 2–4 complete. **Next:** Phase 5 AWS deployment.
 
 Verify: `./scripts/verify-pipeline-e2e.sh` · `./scripts/verify-dlq-redrive.sh` · run DLQ worker: `uv run --project backend python -m eventforge.workers.dlq`

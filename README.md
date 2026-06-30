@@ -24,7 +24,7 @@ Turn open-ended research questions into **cited, multi-source syntheses** you ca
 
 ## Where things stand
 
-**Strategy:** Backend MVP complete (Phase 3). **Phase 4 frontend** — scaffold, SSE, React Flow, dashboard UI, and Cognito sign-in done; **local OTEL next** (Phase 4.5).
+**Strategy:** Backend MVP complete (Phase 3). **Phase 4 complete** — scaffold, SSE, React Flow, dashboard, Cognito sign-in, and local OTEL ✅. **Next: Phase 5** AWS deployment.
 
 | Phase | Focus                                                                         | Status                                                                                                                                                                                                                                                                                                                    |
 | ----- | ----------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -32,8 +32,8 @@ Turn open-ended research questions into **cited, multi-source syntheses** you ca
 | **1** | FastAPI backend, health checks, SQLAlchemy, Alembic                           | ✅ Done                                                                                                                                                                                                                                                                                                                   |
 | **2** | Event pipeline with **stub agents** (ingestion → synthesis), DLQ, idempotency | ✅ Done                                                                                                                                                                                                                                                                                                                   |
 | **3** | **Real AI** — full agent pipeline, cost API, resilience, Cognito auth         | ✅ **Complete**                                                                                                                                                                                                                                                                                                           |
-| **4** | Next.js UI, SSE, React Flow, dashboard, Cognito UI, OTEL                      | **In progress** — [KRE-151](https://linear.app/kreativbiro/issue/KRE-151) SSE ✅ · [KRE-152](https://linear.app/kreativbiro/issue/KRE-152) React Flow ✅ · [KRE-153](https://linear.app/kreativbiro/issue/KRE-153) dashboard ✅ · [KRE-154](https://linear.app/kreativbiro/issue/KRE-154) Cognito UI ✅ · next OTEL local |
-| **5** | AWS deploy (Terraform, ECS, Step Functions fan-out)                           | Planned                                                                                                                                                                                                                                                                                                                   |
+| **4** | Next.js UI, SSE, React Flow, dashboard, Cognito UI, OTEL                      | ✅ **Complete** — [KRE-151](https://linear.app/kreativbiro/issue/KRE-151) SSE · [KRE-152](https://linear.app/kreativbiro/issue/KRE-152) React Flow · [KRE-153](https://linear.app/kreativbiro/issue/KRE-153) dashboard · [KRE-154](https://linear.app/kreativbiro/issue/KRE-154) Cognito UI · [KRE-155](https://linear.app/kreativbiro/issue/KRE-155) OTEL local |
+| **5** | AWS deploy (Terraform, ECS, Step Functions fan-out)                           | **Next**                                                                                                                                                                                                                                                                                                                  |
 | **6** | Polish — demo GIF, E2E tests, RAG eval, cost dashboard                        | Planned                                                                                                                                                                                                                                                                                                                   |
 
 Detail: [`docs/TASKS.md`](./docs/TASKS.md) · Linear: [`docs/LINEAR.md`](./docs/LINEAR.md)
@@ -72,6 +72,7 @@ POST /api/v1/queries  →  EventBridge  →  SQS workers  →  Postgres  →  GE
 | Live React Flow dashboard                                            | ✅ [KRE-152](https://linear.app/kreativbiro/issue/KRE-152)                                                                                |
 | Dashboard UI — submit query, job history, synthesis, sources, cost   | ✅ [KRE-153](https://linear.app/kreativbiro/issue/KRE-153)                                                                                |
 | Cognito sign-in UI — Amplify Auth, Bearer token, route guard         | ✅ [KRE-154](https://linear.app/kreativbiro/issue/KRE-154)                                                                                |
+| Local OTEL — FastAPI + worker spans, collector, Jaeger UI            | ✅ [KRE-155](https://linear.app/kreativbiro/issue/KRE-155)                                                                                |
 
 **Smoke test:** `./scripts/verify-pipeline-e2e.sh` or `make verify-e2e` (API + all workers; real LLM run ~2–3 min with one research worker)
 
@@ -120,6 +121,7 @@ Full diagrams: [`docs/ARCHITECTURE.md`](./docs/ARCHITECTURE.md)
 | **Resilience**           | Exponential backoff retries, per-provider circuit breakers, optional `JOB_MAX_COST_USD`                                     |
 | **Frontend** _(Phase 4)_ | Next.js 16, shadcn/ui, TanStack Query, React Flow, SSE, Amplify Cognito UI ✅                                               |
 | **Auth** _(Phase 3–4)_   | Cognito JWT → FastAPI ✅ · Amplify sign-in + Bearer on API/SSE ✅ ([KRE-154](https://linear.app/kreativbiro/issue/KRE-154)) |
+| **Observability**        | OpenTelemetry → OTLP collector → Jaeger ✅ ([KRE-155](https://linear.app/kreativbiro/issue/KRE-155))                        |
 | **IaC** _(Phase 5)_      | Terraform                                                                                                                   |
 | **Local**                | Docker Compose + LocalStack                                                                                                 |
 
@@ -132,7 +134,7 @@ Full diagrams: [`docs/ARCHITECTURE.md`](./docs/ARCHITECTURE.md)
 ```bash
 cp .env.example .env
 ./scripts/setup-local.sh    # first time
-make dev                    # Postgres + LocalStack + backend + frontend
+make dev                    # Postgres + LocalStack + backend + frontend + OTEL + Jaeger
 
 cd backend && uv run alembic upgrade head   # migrations
 ```
@@ -142,6 +144,7 @@ cd backend && uv run alembic upgrade head   # migrations
 | Frontend | http://localhost:3000      |
 | Backend  | http://localhost:8000      |
 | API docs | http://localhost:8000/docs |
+| Jaeger   | http://localhost:16686     |
 
 **Phase 3 API keys** (in `.env` — required for real ingestion → synthesis path):
 
@@ -168,6 +171,22 @@ cd frontend && cp .env.example .env.local && npm install && npm run dev   # http
 ```bash
 make workers   # all 5 workers + DLQ handler via Honcho (Procfile)
 ```
+
+**Observability** (OTEL + Jaeger — included in `make dev`):
+
+```bash
+# .env
+OTEL_ENABLED=true
+OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4317   # host workers
+OTEL_SERVICE_NAME=eventforge
+
+# Jaeger UI — after submitting a query + running workers
+open http://localhost:16686
+```
+
+Search by **Service** (`eventforge`, `eventforge-worker-ingestion`, …) or tag `correlation_id=<from query response>`. Disable with `OTEL_ENABLED=false`.
+
+Detail: [`docs/LOCAL_DEV.md`](./docs/LOCAL_DEV.md#observability-phase-4)
 
 Or one terminal each:
 
@@ -216,6 +235,7 @@ Full guide: [`docs/LOCAL_DEV.md`](./docs/LOCAL_DEV.md)
 ```
 event-driven/
 ├── backend/src/eventforge/   # API, agents, workers, events, db
+│   ├── core/otel.py          # OTEL setup + agent span helpers
 │   ├── services/llm/         # LLM client + OpenAI/Anthropic providers
 │   ├── services/embedding/   # Chunking + OpenAI embeddings
 │   ├── services/knowledge/   # RAG retrieval + entity extraction
@@ -224,7 +244,7 @@ event-driven/
 │   ├── services/resilience/  # Retry, circuit breaker, cost cap
 │   └── services/search/      # Tavily client
 ├── shared/events/            # JSON Schema contracts (source of truth)
-├── infra/                    # Terraform, LocalStack init, Docker
+├── infra/                    # Terraform, LocalStack init, Docker, OTEL collector config
 ├── docs/                     # PRD, architecture, ADRs, roadmap
 ├── scripts/                  # setup, E2E verify, seed
 └── frontend/                 # Next.js app (Phase 4)

@@ -1,14 +1,13 @@
-import asyncio
 import logging
 from typing import Any
 
 from eventforge.agents.ingestion import parse_query_submitted_event, process_query_submitted
 from eventforge.core.config import get_settings
-from eventforge.core.logging import setup_logging
 from eventforge.db.session import get_session_factory
 from eventforge.events.parser import parse_eventbridge_sqs_body
 from eventforge.events.publisher import EventPublisher
 from eventforge.workers.base import SqsConsumer
+from eventforge.workers.bootstrap import main
 
 logger = logging.getLogger(__name__)
 
@@ -51,12 +50,5 @@ class IngestionWorker(SqsConsumer):
         )
 
 
-async def main() -> None:
-    settings = get_settings()
-    setup_logging(settings)
-    worker = IngestionWorker()
-    await worker.run_forever()
-
-
 if __name__ == "__main__":
-    asyncio.run(main())
+    main(IngestionWorker, service_suffix="ingestion")

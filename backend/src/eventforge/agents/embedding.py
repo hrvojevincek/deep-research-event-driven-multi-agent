@@ -4,6 +4,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from eventforge.core.config import get_settings
+from eventforge.core.otel import traced_agent
 from eventforge.db.models import DocumentChunk, JobStageName, Source
 from eventforge.db.repositories import (
     JobRepository,
@@ -104,6 +105,7 @@ async def _load_or_create_chunks(
     return chunks
 
 
+@traced_agent(WORKER_NAME_EMBEDDING)
 async def process_ingestion_completed(
     session: AsyncSession,
     publisher: EventPublisher,

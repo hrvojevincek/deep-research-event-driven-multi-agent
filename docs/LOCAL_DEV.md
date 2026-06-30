@@ -286,16 +286,24 @@ docker compose exec postgres psql -U eventforge -d eventforge -c "SELECT extname
 When OTEL collector is added to docker-compose:
 
 ```bash
-# Traces (Jaeger UI, if configured)
+make dev   # starts postgres, localstack, otel-collector, jaeger, backend, frontend
+
+# Jaeger UI
 open http://localhost:16686
 ```
+
+Submit a query (UI or API), then search Jaeger by `correlation_id` or service name
+(`eventforge-api`, `eventforge-worker-ingestion`, etc.).
 
 Set in `.env`:
 
 ```
+OTEL_ENABLED=true
 OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4317
 OTEL_SERVICE_NAME=eventforge-api
 ```
+
+Disable locally with `OTEL_ENABLED=false`.
 
 ---
 

@@ -38,10 +38,13 @@ services:
     environment:
       POSTGRES_HOST: postgres
       AWS_ENDPOINT_URL: http://localstack:4566
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
     depends_on:
       postgres:
         condition: service_healthy
       localstack:
+        condition: service_started
+      otel-collector:
         condition: service_started
 
   frontend:
@@ -56,14 +59,23 @@ services:
     depends_on:
       - backend
 
-  # Uncomment when OTEL collector is configured (Phase 4)
-  # otel-collector:
-  #   image: otel/opentelemetry-collector-contrib:0.114.0
-  #   ports:
-  #     - "4317:4317"
-  #     - "4318:4318"
-  #   volumes:
-  #     - ./infra/docker/otel/otel-collector-config.yaml:/etc/otelcol-contrib/config.yaml
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.114.0
+    command: ["--config=/etc/otelcol-contrib/config.yaml"]
+    ports:
+      - "4317:4317"
+      - "4318:4318"
+    volumes:
+      - ./infra/docker/otel/otel-collector-config.yaml:/etc/otelcol-contrib/config.yaml
+    depends_on:
+      - jaeger
+
+  jaeger:
+    image: jaegertracing/all-in-one:1.60
+    ports:
+      - "16686:16686"
+    environment:
+      COLLECTOR_OTLP_ENABLED: "true"
 
 volumes:
   postgres_data:

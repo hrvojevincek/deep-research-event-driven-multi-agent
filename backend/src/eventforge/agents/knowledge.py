@@ -2,6 +2,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from eventforge.core.config import get_settings
+from eventforge.core.otel import traced_agent
 from eventforge.db.models import DocumentChunk, Job, JobStageName, KnowledgeEntity
 from eventforge.db.repositories import (
     DocumentChunkRepository,
@@ -67,6 +68,7 @@ async def _load_or_create_entities(
     return entities
 
 
+@traced_agent(WORKER_NAME_KNOWLEDGE)
 async def process_embedding_completed(
     session: AsyncSession,
     publisher: EventPublisher,
