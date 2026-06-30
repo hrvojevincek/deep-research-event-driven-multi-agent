@@ -188,8 +188,10 @@ When an issue closes → check the matching box below and ensure `KRE-xxx` link 
 
 ### 4.4 Authentication (Cognito UI)
 
-- [ ] Cognito Hosted UI or Amplify Auth in Next.js
-- [ ] Pass Cognito ID token to API client; protect routes (middleware or client-side guard)
+→ [KRE-154](https://linear.app/kreativbiro/issue/KRE-154)
+
+- [x] Cognito Hosted UI or Amplify Auth in Next.js
+- [x] Pass Cognito ID token to API client; protect routes (middleware or client-side guard)
 
 ### 4.5 Observability (Local)
 
@@ -295,6 +297,6 @@ Project: EventForge
 
 ## Current Priority
 
-**Backend-first track:** Phase 2–3 complete. **Phase 4.3 complete** (dashboard UI); next **Phase 4.4** Cognito UI.
+**Backend-first track:** Phase 2–3 complete. **Phase 4.4 complete** (Cognito UI); next **Phase 4.5** OTEL local.
 
 Verify: `./scripts/verify-pipeline-e2e.sh` · `./scripts/verify-dlq-redrive.sh` · run DLQ worker: `uv run --project backend python -m eventforge.workers.dlq`

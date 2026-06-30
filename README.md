@@ -24,17 +24,17 @@ Turn open-ended research questions into **cited, multi-source syntheses** you ca
 
 ## Where things stand
 
-**Strategy:** Backend MVP complete (Phase 3). **Phase 4 frontend** — scaffold, SSE, React Flow, and dashboard UI done; **Cognito UI next** (Phase 4.4).
+**Strategy:** Backend MVP complete (Phase 3). **Phase 4 frontend** — scaffold, SSE, React Flow, dashboard UI, and Cognito sign-in done; **local OTEL next** (Phase 4.5).
 
-| Phase | Focus                                                                         | Status                                                                                                           |
-| ----- | ----------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
-| **0** | Docs, Docker, LocalStack, Postgres + pgvector                                 | ✅ Done                                                                                                          |
-| **1** | FastAPI backend, health checks, SQLAlchemy, Alembic                           | ✅ Done                                                                                                          |
-| **2** | Event pipeline with **stub agents** (ingestion → synthesis), DLQ, idempotency | ✅ Done                                                                                                          |
-| **3** | **Real AI** — full agent pipeline, cost API, resilience, Cognito auth         | ✅ **Complete**                                                                                                  |
-| **4** | Next.js UI, SSE live updates, React Flow, dashboard UI, Cognito | **In progress** — [KRE-151](https://linear.app/kreativbiro/issue/KRE-151) SSE ✅ · [KRE-152](https://linear.app/kreativbiro/issue/KRE-152) React Flow ✅ · [KRE-153](https://linear.app/kreativbiro/issue/KRE-153) dashboard ✅ · next Cognito UI |
-| **5** | AWS deploy (Terraform, ECS, Step Functions fan-out)                           | Planned                                                                                                          |
-| **6** | Polish — demo GIF, E2E tests, RAG eval, cost dashboard                        | Planned                                                                                                          |
+| Phase | Focus                                                                         | Status                                                                                                                                                                                                                                                                                                                    |
+| ----- | ----------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **0** | Docs, Docker, LocalStack, Postgres + pgvector                                 | ✅ Done                                                                                                                                                                                                                                                                                                                   |
+| **1** | FastAPI backend, health checks, SQLAlchemy, Alembic                           | ✅ Done                                                                                                                                                                                                                                                                                                                   |
+| **2** | Event pipeline with **stub agents** (ingestion → synthesis), DLQ, idempotency | ✅ Done                                                                                                                                                                                                                                                                                                                   |
+| **3** | **Real AI** — full agent pipeline, cost API, resilience, Cognito auth         | ✅ **Complete**                                                                                                                                                                                                                                                                                                           |
+| **4** | Next.js UI, SSE, React Flow, dashboard, Cognito UI, OTEL                      | **In progress** — [KRE-151](https://linear.app/kreativbiro/issue/KRE-151) SSE ✅ · [KRE-152](https://linear.app/kreativbiro/issue/KRE-152) React Flow ✅ · [KRE-153](https://linear.app/kreativbiro/issue/KRE-153) dashboard ✅ · [KRE-154](https://linear.app/kreativbiro/issue/KRE-154) Cognito UI ✅ · next OTEL local |
+| **5** | AWS deploy (Terraform, ECS, Step Functions fan-out)                           | Planned                                                                                                                                                                                                                                                                                                                   |
+| **6** | Polish — demo GIF, E2E tests, RAG eval, cost dashboard                        | Planned                                                                                                                                                                                                                                                                                                                   |
 
 Detail: [`docs/TASKS.md`](./docs/TASKS.md) · Linear: [`docs/LINEAR.md`](./docs/LINEAR.md)
 
@@ -71,6 +71,7 @@ POST /api/v1/queries  →  EventBridge  →  SQS workers  →  Postgres  →  GE
 | SSE live pipeline updates (`useJobStream` + `/queries/{id}/stream`)  | ✅ [KRE-151](https://linear.app/kreativbiro/issue/KRE-151)                                                                                |
 | Live React Flow dashboard                                            | ✅ [KRE-152](https://linear.app/kreativbiro/issue/KRE-152)                                                                                |
 | Dashboard UI — submit query, job history, synthesis, sources, cost   | ✅ [KRE-153](https://linear.app/kreativbiro/issue/KRE-153)                                                                                |
+| Cognito sign-in UI — Amplify Auth, Bearer token, route guard         | ✅ [KRE-154](https://linear.app/kreativbiro/issue/KRE-154)                                                                                |
 
 **Smoke test:** `./scripts/verify-pipeline-e2e.sh` or `make verify-e2e` (API + all workers; real LLM run ~2–3 min with one research worker)
 
@@ -109,18 +110,18 @@ Full diagrams: [`docs/ARCHITECTURE.md`](./docs/ARCHITECTURE.md)
 
 ## Stack
 
-| Layer                    | Tech                                                                                                                      |
-| ------------------------ | ------------------------------------------------------------------------------------------------------------------------- |
-| **API**                  | Python 3.12+, FastAPI, Pydantic v2, SQLAlchemy 2.0, uv                                                                    |
-| **Workers**              | Async SQS consumers, one module per pipeline stage                                                                        |
-| **Events**               | AWS EventBridge + SQS (+ Step Functions for research fan-out in prod)                                                     |
-| **Data**                 | Postgres 16 + pgvector                                                                                                    |
-| **LLM**                  | OpenAI + Anthropic client; Tavily search; OpenAI embeddings; RAG; cited synthesis                                         |
-| **Resilience**           | Exponential backoff retries, per-provider circuit breakers, optional `JOB_MAX_COST_USD`                                   |
-| **Frontend** _(Phase 4)_ | Next.js 16, shadcn/ui, TanStack Query, React Flow, SSE ✅; Cognito UI → Phase 4.4 |
-| **Auth** _(Phase 3–4)_   | Cognito JWT → FastAPI ✅ (backend); Cognito Hosted UI in Next.js → Phase 4                                                |
-| **IaC** _(Phase 5)_      | Terraform                                                                                                                 |
-| **Local**                | Docker Compose + LocalStack                                                                                               |
+| Layer                    | Tech                                                                                                                        |
+| ------------------------ | --------------------------------------------------------------------------------------------------------------------------- |
+| **API**                  | Python 3.12+, FastAPI, Pydantic v2, SQLAlchemy 2.0, uv                                                                      |
+| **Workers**              | Async SQS consumers, one module per pipeline stage                                                                          |
+| **Events**               | AWS EventBridge + SQS (+ Step Functions for research fan-out in prod)                                                       |
+| **Data**                 | Postgres 16 + pgvector                                                                                                      |
+| **LLM**                  | OpenAI + Anthropic client; Tavily search; OpenAI embeddings; RAG; cited synthesis                                           |
+| **Resilience**           | Exponential backoff retries, per-provider circuit breakers, optional `JOB_MAX_COST_USD`                                     |
+| **Frontend** _(Phase 4)_ | Next.js 16, shadcn/ui, TanStack Query, React Flow, SSE, Amplify Cognito UI ✅                                               |
+| **Auth** _(Phase 3–4)_   | Cognito JWT → FastAPI ✅ · Amplify sign-in + Bearer on API/SSE ✅ ([KRE-154](https://linear.app/kreativbiro/issue/KRE-154)) |
+| **IaC** _(Phase 5)_      | Terraform                                                                                                                   |
+| **Local**                | Docker Compose + LocalStack                                                                                                 |
 
 ---
 
@@ -159,7 +160,7 @@ JOB_MAX_COST_USD=2.0           # optional — per-job LLM spend cap (omit to dis
 ```bash
 docker compose up postgres localstack
 cd backend && uv sync && uv run uvicorn eventforge.main:app --reload --port 8000
-cd frontend && cp .env.example .env && npm install && npm run dev   # http://localhost:3000
+cd frontend && cp .env.example .env.local && npm install && npm run dev   # http://localhost:3000
 ```
 
 **Workers** (required for pipeline to complete):
@@ -228,10 +229,10 @@ event-driven/
 ├── scripts/                  # setup, E2E verify, seed
 └── frontend/                 # Next.js app (Phase 4)
     └── src/
-        ├── app/              # /, /queries/new, /queries/[id]
-        ├── components/       # layout, dashboard, workflow (React Flow), shadcn/ui
+        ├── app/              # /, /login, /queries/new, /queries/[id]
+        ├── components/       # layout, auth, dashboard, workflow (React Flow), shadcn/ui
         ├── hooks/            # useJobStream (SSE), use-queries (TanStack Query)
-        ├── lib/api-client.ts # typed fetch → NEXT_PUBLIC_API_URL
+        ├── lib/              # api-client, auth-config, auth-token, sse-client
         └── types/api.ts      # generated from OpenAPI (npm run codegen)
 ```
 

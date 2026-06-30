@@ -3,6 +3,7 @@ import { Geist_Mono, JetBrains_Mono } from "next/font/google";
 
 import { AppShell } from "@/components/layout/app-shell";
 import { QueryProvider } from "@/components/providers/query-provider";
+import { AuthProvider } from "@/components/providers/auth-provider";
 import { ThemeProvider } from "@/components/theme-provider";
 
 import "./globals.css";
@@ -35,9 +36,11 @@ export default function RootLayout({
     >
       <body className="min-h-full">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <QueryProvider>
-            <AppShell>{children}</AppShell>
-          </QueryProvider>
+          <AuthProvider>
+            <QueryProvider>
+              <AppShell>{children}</AppShell>
+            </QueryProvider>
+          </AuthProvider>
         </ThemeProvider>
       </body>
     </html>

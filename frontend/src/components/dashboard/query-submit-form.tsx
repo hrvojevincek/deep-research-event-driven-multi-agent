@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+import { isAuthEnabled } from "@/lib/auth-config";
+
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -138,8 +140,9 @@ export function QuerySubmitForm() {
         </CardContent>
         <CardFooter className="flex flex-wrap items-center justify-between gap-3">
           <p className="text-xs text-muted-foreground">
-            Local dev uses auth bypass when{" "}
-            <code className="font-mono">AUTH_DISABLED=true</code>.
+            {isAuthEnabled()
+              ? "Queries are scoped to your signed-in account."
+              : "Local dev uses auth bypass when AUTH_DISABLED=true."}
           </p>
           <div className="flex gap-2">
             <Button

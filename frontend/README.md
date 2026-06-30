@@ -7,7 +7,8 @@ Next.js 16 App Router dashboard for the EventForge research pipeline.
 - Next.js 16, TypeScript, Tailwind CSS, shadcn/ui
 - TanStack Query — query list, detail, submit
 - React Flow — live pipeline graph on `/queries/[id]`
-- SSE (`useJobStream`) — real-time stage updates
+- SSE (`useJobStream`) — real-time stage updates (fetch + Bearer auth)
+- AWS Amplify Auth — Cognito sign-in (Phase 4.4)
 - OpenAPI codegen — `npm run codegen` → `src/types/api.ts`
 
 ## Pages
@@ -16,17 +17,19 @@ Next.js 16 App Router dashboard for the EventForge research pipeline.
 | ----- | ------- |
 | `/` | Landing + recent job history |
 | `/queries/new` | Submit research query |
+| `/login` | Cognito sign-in (when auth enabled) |
+| `/auth/callback` | OAuth redirect handler |
 | `/queries/[id]` | Live pipeline, synthesis, sources, cost |
 
 ## Local dev
 
 ```bash
-cp .env.example .env   # NEXT_PUBLIC_API_URL=http://localhost:8000
+cp .env.example .env.local   # NEXT_PUBLIC_AUTH_DISABLED=true by default
 npm install
-npm run dev            # http://localhost:3000
+npm run dev                  # http://localhost:3000
 ```
 
-Backend must run with `AUTH_DISABLED=true` for local UI (no Cognito sign-in yet — Phase 4.4).
+Default local dev uses `NEXT_PUBLIC_AUTH_DISABLED=true` (matches backend `AUTH_DISABLED=true`). For real Cognito, see [`docs/LOCAL_DEV.md`](../docs/LOCAL_DEV.md) § Authentication.
 
 ```bash
 # repo root
@@ -55,11 +58,15 @@ src/
 │   ├── dashboard/          # submit form, history, synthesis, sources, cost
 │   ├── workflow/           # React Flow pipeline graph
 │   ├── layout/             # shell, sidebar, header
+│   ├── auth/               # login form, route guard
 │   └── ui/                 # shadcn/ui
 ├── hooks/
 │   ├── useJobStream.ts     # SSE subscription
 │   └── use-queries.ts      # TanStack Query hooks
-└── lib/api-client.ts       # typed fetch wrapper
+└── lib/
+    ├── api-client.ts       # typed fetch wrapper
+    ├── auth-config.ts      # Amplify / Cognito config
+    └── auth-token.ts       # ID token for API + SSE
 ```
 
-Docs: [`docs/LOCAL_DEV.md`](../docs/LOCAL_DEV.md) · Linear: [KRE-153](https://linear.app/kreativbiro/issue/KRE-153) (Phase 4.3)
+Docs: [`docs/LOCAL_DEV.md`](../docs/LOCAL_DEV.md) · [KRE-154](https://linear.app/kreativbiro/issue/KRE-154) (Phase 4.4)

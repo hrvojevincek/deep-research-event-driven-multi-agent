@@ -121,7 +121,32 @@ curl -s -X POST "http://localhost:8000/api/v1/queries" \
   -d '{"topic":"Cognito auth test","depth":"standard"}'
 ```
 
-Terraform for the user pool lands in **Phase 5** (`modules/cognito`). Phase 4 adds Hosted UI / Amplify in Next.js.
+Terraform for the user pool lands in **Phase 5** (`modules/cognito`). Phase 4 adds Hosted UI / Amplify in Next.js (see `frontend/.env.example`).
+
+### Frontend (Phase 4.4)
+
+When testing real Cognito auth end-to-end:
+
+```bash
+# backend .env
+AUTH_DISABLED=false
+COGNITO_USER_POOL_ID=eu-west-2_XXXXXXXXX
+COGNITO_REGION=eu-west-2
+COGNITO_APP_CLIENT_ID=your-app-client-id
+
+# frontend/.env.local
+NEXT_PUBLIC_AUTH_DISABLED=false
+NEXT_PUBLIC_COGNITO_USER_POOL_ID=eu-west-2_XXXXXXXXX
+NEXT_PUBLIC_COGNITO_APP_CLIENT_ID=your-app-client-id
+NEXT_PUBLIC_COGNITO_REGION=eu-west-2
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+# Optional Hosted UI:
+# NEXT_PUBLIC_COGNITO_DOMAIN=your-domain.auth.eu-west-2.amazoncognito.com
+```
+
+1. Sign in at http://localhost:3000/login (email/password or Hosted UI).
+2. The UI attaches the Cognito **ID token** to API requests and SSE streams.
+3. User-scoped query history and job access follow backend [KRE-146](https://linear.app/kreativbiro/issue/KRE-146).
 
 ---
 
@@ -395,5 +420,5 @@ After infrastructure is verified:
 2. **Phase 4.1:** SSE live updates on `/queries/[id]` ✅ ([KRE-151](https://linear.app/kreativbiro/issue/KRE-151))
 3. **Phase 4.2:** React Flow pipeline visualization ✅ ([KRE-152](https://linear.app/kreativbiro/issue/KRE-152))
 4. **Phase 4.3:** Dashboard UI — submit, history, synthesis, sources, cost ✅ ([KRE-153](https://linear.app/kreativbiro/issue/KRE-153))
-5. **Phase 4.4:** Cognito sign-in UI — next
-6. See `docs/TASKS.md` for full roadmap
+5. **Phase 4.4:** Cognito sign-in UI ✅ ([KRE-154](https://linear.app/kreativbiro/issue/KRE-154))
+6. **Phase 4.5:** Local OTEL — next

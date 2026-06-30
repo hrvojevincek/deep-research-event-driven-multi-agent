@@ -13,18 +13,19 @@
 
 ## Latest progress (2026-06-30)
 
-**Phase 4.3 complete** — [KRE-153](https://linear.app/kreativbiro/issue/KRE-153) dashboard UI (TanStack Query, submit, history, synthesis, sources, cost).
+**Phase 4.4 complete** — [KRE-154](https://linear.app/kreativbiro/issue/KRE-154) Cognito UI (Amplify Auth, Bearer token, route guard).
 
-| Done (Phase 4)                                        | Next                    |
-| ----------------------------------------------------- | ----------------------- |
-| KRE-119 Next.js + Tailwind + shadcn                   | **Phase 4.4** Cognito UI |
-| KRE-121 layout + placeholder pages                    | Phase 4.5 OTEL local    |
-| KRE-124 API client + Dockerfile + compose             |                         |
-| KRE-126 OpenAPI → TypeScript codegen                  |                         |
-| KRE-128 full-stack smoke test (`verify-fullstack.sh`) |                         |
-| KRE-151 SSE + `useJobStream`                          |                         |
-| KRE-152 React Flow pipeline visualization             |                         |
-| KRE-153 Dashboard UI + TanStack Query                 |                         |
+| Done (Phase 4)                                        | Next                     |
+| ----------------------------------------------------- | ------------------------ |
+| KRE-119 Next.js + Tailwind + shadcn                   | **Phase 4.5** OTEL local |
+| KRE-121 layout + placeholder pages                    |                          |
+| KRE-124 API client + Dockerfile + compose             |                          |
+| KRE-126 OpenAPI → TypeScript codegen                  |                          |
+| KRE-128 full-stack smoke test (`verify-fullstack.sh`) |                          |
+| KRE-151 SSE + `useJobStream`                          |                          |
+| KRE-152 React Flow pipeline visualization             |                          |
+| KRE-153 Dashboard UI + TanStack Query                 |                          |
+| KRE-154 Cognito UI (Amplify Auth)                     |                          |
 
 **Phase 3 complete** — real AI pipeline + Cognito JWT auth verified end-to-end.
 
@@ -47,13 +48,13 @@ save_issue(id: "KRE-122", state: "Done")
 
 ## Milestones
 
-| Milestone               | Status                                                               |
-| ----------------------- | -------------------------------------------------------------------- |
-| Phase 0 — Foundation    | Complete                                                             |
-| Phase 1 — Scaffolding   | Backend complete; frontend → Phase 4                                 |
-| Phase 2 — Core Pipeline | Complete (stub agents + E2E)                                         |
-| Phase 3 — Real AI       | **Complete** — KRE-139–147 (real agents + Cognito auth + resilience) |
-| Phase 4 — Frontend      | **In progress** — KRE-151 ✅ SSE; KRE-152 ✅ React Flow; KRE-153 ✅ dashboard UI; next **Phase 4.4** Cognito |
+| Milestone               | Status                                                                                                                             |
+| ----------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| Phase 0 — Foundation    | Complete                                                                                                                           |
+| Phase 1 — Scaffolding   | Backend complete; frontend → Phase 4                                                                                               |
+| Phase 2 — Core Pipeline | Complete (stub agents + E2E)                                                                                                       |
+| Phase 3 — Real AI       | **Complete** — KRE-139–147 (real agents + Cognito auth + resilience)                                                               |
+| Phase 4 — Frontend      | **In progress** — KRE-151 ✅ SSE; KRE-152 ✅ React Flow; KRE-153 ✅ dashboard UI; Phase 4.4 ✅ Cognito UI; next **Phase 4.5** OTEL |
 
 ## Issue index (Phase 0 + 1)
 
@@ -126,10 +127,11 @@ Also see deferred infra/reliability: KRE-136 (outbox), KRE-137, KRE-138.
 | ID     | Linear                                                  | Title                                                 | Estimate | Blocked by |
 | ------ | ------------------------------------------------------- | ----------------------------------------------------- | -------- | ---------- |
 | EF-035 | [KRE-151](https://linear.app/kreativbiro/issue/KRE-151) | SSE pipeline stream + `useJobStream` hook (Phase 4.1) | 5        | KRE-128    |
-| EF-036 | [KRE-152](https://linear.app/kreativbiro/issue/KRE-152) | React Flow pipeline visualization (Phase 4.2)       | 5        | KRE-151    |
+| EF-036 | [KRE-152](https://linear.app/kreativbiro/issue/KRE-152) | React Flow pipeline visualization (Phase 4.2)         | 5        | KRE-151    |
 | EF-037 | [KRE-153](https://linear.app/kreativbiro/issue/KRE-153) | Dashboard UI — submit, history, synthesis (Phase 4.3) | 5        | KRE-152    |
+| EF-038 | [KRE-154](https://linear.app/kreativbiro/issue/KRE-154) | Cognito UI — Amplify Auth, Bearer token (Phase 4.4)   | 5        | KRE-153    |
 
-> Phase 4.4+ (Cognito UI, local OTEL) — track in `docs/TASKS.md` §4.4–4.5; Linear issues TBD.
+> Phase 4.5+ (local OTEL) — track in `docs/TASKS.md` §4.5.
 
 ## Backend-first track (recommended)
 
@@ -147,8 +149,8 @@ Done:   KRE-139 (LLM client + cost tracking foundation)
         KRE-146 (Cognito JWT auth + user-scoped queries)
         KRE-147 (LLM resilience — retry, circuit breaker, cost cap)
 
-Next:   Phase 4.4 Cognito UI → 4.5 OTEL local
-        Done: KRE-119 ✅ KRE-121 ✅ KRE-124 ✅ KRE-126 ✅ KRE-128 ✅ KRE-151 ✅ KRE-152 ✅ KRE-153 ✅
+Next:   Phase 4.5 OTEL local
+        Done: KRE-119 ✅ … KRE-153 ✅ KRE-154 ✅
 
 Optional: KRE-150 umbrella → KRE-148 chunking, KRE-149 richer ingestion, KRE-133 RAG eval (+ KRE-136/137/138)
 

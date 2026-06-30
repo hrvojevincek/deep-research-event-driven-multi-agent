@@ -2,7 +2,9 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import { getIdToken } from "@/lib/auth-token";
 import { getApiBaseUrl } from "@/lib/api-client";
+import { connectSse } from "@/lib/sse-client";
 import type { JobStageSnapshot, JobStreamEvent, StageStatus } from "@/types/job-stream";
 import { buildStageMap } from "@/types/job-stream";
 
@@ -86,65 +88,74 @@ export function useJobStream(jobId: string): UseJobStreamState {
   }, []);
 
   useEffect(() => {
-    let source: EventSource | null = null;
     let cancelled = false;
+    const abortController = new AbortController();
+    let jobComplete = false;
 
-    const connect = () => {
-      if (cancelled) {
+    const connect = async () => {
+      if (cancelled || jobComplete) {
         return;
       }
 
       const url = `${getApiBaseUrl()}/api/v1/queries/${jobId}/stream`;
-      source = new EventSource(url);
+      const token = await getIdToken();
 
-      source.onopen = () => {
-        backoffRef.current = INITIAL_BACKOFF_MS;
+      try {
         setState((previous) => ({ ...previous, connected: true, error: null }));
-      };
+        backoffRef.current = INITIAL_BACKOFF_MS;
 
-      const onPayload = (message: MessageEvent<string>) => {
-        try {
-          const parsed = JSON.parse(message.data) as JobStreamEvent;
-          handleEvent(parsed);
-          if (parsed.event === "job_complete") {
-            source?.close();
-          }
-        } catch {
+        await connectSse(
+          url,
+          token,
+          (_eventName, data) => {
+            try {
+              const parsed = JSON.parse(data) as JobStreamEvent;
+              handleEvent(parsed);
+              if (parsed.event === "job_complete") {
+                jobComplete = true;
+                abortController.abort();
+              }
+            } catch {
+              setState((previous) => ({
+                ...previous,
+                error: "Failed to parse stream event",
+              }));
+            }
+          },
+          abortController.signal,
+        );
+
+        if (!cancelled && !jobComplete) {
           setState((previous) => ({
             ...previous,
-            error: "Failed to parse stream event",
+            connected: false,
+            error: "Stream disconnected",
           }));
         }
-      };
+      } catch {
+        if (cancelled || abortController.signal.aborted || jobComplete) {
+          return;
+        }
 
-      source.addEventListener("snapshot", onPayload);
-      source.addEventListener("stage_update", onPayload);
-      source.addEventListener("job_complete", onPayload);
-      source.onmessage = onPayload;
-
-      source.onerror = () => {
-        source?.close();
         setState((previous) => ({
           ...previous,
           connected: false,
           error: "Stream disconnected",
         }));
 
-        if (cancelled) {
-          return;
-        }
-
         const delay = backoffRef.current;
         backoffRef.current = Math.min(delay * 2, MAX_BACKOFF_MS);
-        reconnectTimerRef.current = setTimeout(connect, delay);
-      };
+        reconnectTimerRef.current = setTimeout(() => {
+          void connect();
+        }, delay);
+      }
     };
 
-    connect();
+    void connect();
 
     return () => {
       cancelled = true;
-      source?.close();
+      abortController.abort();
       if (reconnectTimerRef.current) {
         clearTimeout(reconnectTimerRef.current);
       }

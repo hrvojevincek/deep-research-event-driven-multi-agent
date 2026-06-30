@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 
+import { AuthGate } from "@/components/auth/auth-gate";
 import { SiteHeader } from "@/components/layout/site-header";
 import { SiteSidebar } from "@/components/layout/site-sidebar";
 import { cn } from "@/lib/utils";
@@ -43,7 +44,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
       <div className="flex min-w-0 flex-1 flex-col">
         <SiteHeader onMenuClick={() => setMobileNavOpen(true)} />
-        <main className="flex flex-1 flex-col">{children}</main>
+        <main className="flex flex-1 flex-col">
+          <AuthGate>{children}</AuthGate>
+        </main>
       </div>
     </div>
   );

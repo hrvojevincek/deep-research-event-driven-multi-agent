@@ -26,7 +26,7 @@
 
 ## Current status
 
-**Phase 3** complete (real AI + Cognito auth). **Phase 4.1–4.3** complete (SSE [KRE-151](https://linear.app/kreativbiro/issue/KRE-151), React Flow [KRE-152](https://linear.app/kreativbiro/issue/KRE-152), dashboard [KRE-153](https://linear.app/kreativbiro/issue/KRE-153)). **Next:** Phase 4.4 Cognito UI. Index: `docs/LINEAR.md`
+**Phase 3** complete (real AI + Cognito auth). **Phase 4.1–4.4** complete (SSE [KRE-151](https://linear.app/kreativbiro/issue/KRE-151), React Flow [KRE-152](https://linear.app/kreativbiro/issue/KRE-152), dashboard [KRE-153](https://linear.app/kreativbiro/issue/KRE-153), Cognito UI [KRE-154](https://linear.app/kreativbiro/issue/KRE-154)). **Next:** Phase 4.5 OTEL local. Index: `docs/LINEAR.md`
 
 ## Commands
 
