@@ -23,6 +23,26 @@ jobs:
 
   test-backend:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: pgvector/pgvector:pg16
+        env:
+          POSTGRES_DB: eventforge
+          POSTGRES_USER: eventforge
+          POSTGRES_PASSWORD: changeme
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U eventforge -d eventforge"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      POSTGRES_HOST: localhost
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: eventforge
+      POSTGRES_USER: eventforge
+      POSTGRES_PASSWORD: changeme
     steps:
       - uses: actions/checkout@v4
 
@@ -32,6 +52,10 @@ jobs:
 
       - name: Install backend dev dependencies
         run: uv sync --project backend --group dev
+
+      - name: Run database migrations
+        working-directory: backend
+        run: uv run alembic upgrade head
 
       - name: Pytest
         run: uv run --project backend pytest backend/tests -m "not integration"

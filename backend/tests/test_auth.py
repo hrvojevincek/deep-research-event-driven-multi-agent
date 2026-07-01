@@ -159,9 +159,13 @@ async def test_list_queries_scoped_to_authenticated_user(
     auth_client: AsyncClient,
     db_session: AsyncSession,
 ) -> None:
+    auth_client.mock_validator.validate.return_value = CognitoClaims(  # type: ignore[attr-defined]
+        sub="list-scope-owner",
+        email="list-owner@example.com",
+    )
     owner = await UserRepository(db_session).get_or_create_by_auth_subject(
-        "cognito-sub-123",
-        email="auth-user@example.com",
+        "list-scope-owner",
+        email="list-owner@example.com",
     )
     other = await UserRepository(db_session).get_or_create_by_auth_subject(
         "other-sub",
