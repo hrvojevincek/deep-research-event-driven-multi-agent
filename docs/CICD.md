@@ -39,28 +39,41 @@ create_github_oidc_provider = false
 
 ### 2. GitHub repository configuration
 
-**Repository variable** (Settings → Secrets and variables → Actions → Variables):
+**Important:** `AWS_DEPLOY_ROLE_ARN` must be a **repository variable**, not only a secret.
 
-| Name                  | Example                                                        | Required |
-| --------------------- | -------------------------------------------------------------- | -------- |
-| `AWS_DEPLOY_ROLE_ARN` | `arn:aws:iam::123456789012:role/eventforge-dev-github-actions` | Yes      |
+GitHub → **Settings → Secrets and variables → Actions**:
 
-Get the ARN:
+| Tab | Name | Value | Required |
+| --- | ---- | ----- | -------- |
+| **Variables** | `AWS_DEPLOY_ROLE_ARN` | Full IAM role ARN from Terraform output | **Yes (recommended)** |
+| Secrets | `AWS_DEPLOY_ROLE_ARN` | Same ARN | Optional fallback |
+
+The deploy workflow reads **Variables first**, then Secrets. Putting the ARN only under Secrets used to work only if you also had it in Variables — both are now supported, but **Variables** is the documented path.
+
+Example value:
+
+```text
+arn:aws:iam::123456789012:role/eventforge-dev-github-actions
+```
+
+Get the ARN after `terraform apply`:
 
 ```bash
+cd infra/terraform/environments/dev
 terraform output -raw github_actions_role_arn
 ```
 
-**Optional variables** (defaults work for standard dev naming):
+Paste with **no trailing spaces** and no shell `%` (zsh artifact). Role name must be `eventforge-dev-github-actions` unless you renamed it in Terraform.
 
-| Name                      | Default                          |
+**Optional overrides** — defaults are hardcoded in `.github/workflows/deploy.yml` (`env` block). To customize region/cluster naming, edit that file or add repository variables with a resolve step in the workflow.
+
+| Name                      | Default in workflow              |
 | ------------------------- | -------------------------------- |
 | `AWS_REGION`              | `eu-west-2`                      |
 | `ECS_CLUSTER_NAME`        | `eventforge-dev-cluster`         |
 | `ECS_NAME_PREFIX`         | `eventforge-dev`                 |
 | `FRONTEND_BUILD_SSM_PATH` | `/eventforge/dev/frontend-build` |
-| `ECR_BACKEND_REPOSITORY`  | auto-discovered                  |
-| `ECR_FRONTEND_REPOSITORY` | auto-discovered                  |
+| ECR repository URIs        | Auto-discovered via `aws ecr describe-repositories` (`${ECS_NAME_PREFIX}-backend` / `-frontend`) |
 
 **Repository secret** (for Terraform plan/apply in CI):
 
@@ -113,4 +126,4 @@ ECS_CLUSTER_NAME=eventforge-dev-cluster BACKEND_IMAGE=IMAGE_URI \
 | Frontend build missing Cognito vars | `terraform apply` (writes SSM) or check `frontend_build_ssm_path` output                                                             |
 | Terraform apply fails in CI         | Add `TFVARS_DEV` secret; enable S3 remote backend                                                                                    |
 | OIDC provider already exists        | `create_github_oidc_provider = false`                                                                                                |
-| `Not authorized to perform sts:AssumeRoleWithWebIdentity` | 1) `AWS_DEPLOY_ROLE_ARN` must match `terraform output -raw github_actions_role_arn` (full ARN, correct account). 2) `github_org` / `github_repo` in tfvars must match the GitHub repo (`hrvojevincek/event-driven-multi-agent`). 3) Re-apply Terraform to refresh the role trust policy (`oidc_subject_wildcard = true` in dev). 4) Check workflow **OIDC context** log for `repository=` vs trust policy. 5) PRs from forks cannot assume the role. |
+| `Not authorized to perform sts:AssumeRoleWithWebIdentity` | **Most common:** `github_repo` in Terraform does not match the real GitHub repo name (OIDC `sub` claim). This repo is `hrvojevincek/deep-research-event-driven-multi-agent` — set `github_repo` in tfvars, re-apply, and confirm deploy log `github_repository=` matches trust policy `repo:ORG/REPO:*`. Also: put full role ARN in **Actions → Variables** (or Secrets); PRs from forks cannot assume the role. |

@@ -93,7 +93,7 @@ output "worker_service_names" {
 }
 
 output "github_actions_role_arn" {
-  description = "IAM role ARN — set as GitHub repository secret AWS_DEPLOY_ROLE_ARN."
+  description = "IAM role ARN — set as GitHub repository variable AWS_DEPLOY_ROLE_ARN (Actions → Variables, not Secrets)."
   value       = var.enable_github_oidc ? module.github_oidc[0].role_arn : null
 }
 

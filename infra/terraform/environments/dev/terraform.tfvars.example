@@ -27,7 +27,7 @@ auth_disabled = false
 
 # GitHub OIDC — must match the repo running Actions (see docs/CICD.md):
 # github_org  = "hrvojevincek"
-# github_repo = "event-driven-multi-agent"
+# github_repo = "deep-research-event-driven-multi-agent"
 
 # Optional Cognito domain prefix if eventforge-dev is taken globally:
 # cognito_domain_prefix = "eventforge-dev-yourname"

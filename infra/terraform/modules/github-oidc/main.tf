@@ -67,12 +67,6 @@ data "aws_iam_policy_document" "github_assume" {
     }
 
     condition {
-      test     = "StringEquals"
-      variable = "token.actions.githubusercontent.com:iss"
-      values   = ["https://token.actions.githubusercontent.com"]
-    }
-
-    condition {
       test     = "StringLike"
       variable = "token.actions.githubusercontent.com:sub"
       values   = local.github_subjects

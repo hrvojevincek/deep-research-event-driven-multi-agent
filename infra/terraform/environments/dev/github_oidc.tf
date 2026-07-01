@@ -5,9 +5,9 @@ variable "github_org" {
 }
 
 variable "github_repo" {
-  description = "GitHub repository name for OIDC trust."
+  description = "GitHub repository name for OIDC trust (must match github.repository in Actions)."
   type        = string
-  default     = "event-driven-multi-agent"
+  default     = "deep-research-event-driven-multi-agent"
 }
 
 variable "enable_github_oidc" {
